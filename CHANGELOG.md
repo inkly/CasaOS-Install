@@ -2,13 +2,18 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
-## v0.4.40 - 2026-09-04
+## [0.4.40] - 2026-09-04
 
-First release of the inkly distribution. Components: CasaOS v0.4.40, CasaOS-UI v0.4.31, AppManagement v0.4.20, Gateway v0.4.18, UserService v0.4.18, MessageBus v0.4.18, LocalStorage v0.4.29.
+First release of the inkly distribution. Components: CasaOS `v0.4.40`, CasaOS-UI `v0.4.31`, AppManagement `v0.4.20`, Gateway `v0.4.18`, UserService `v0.4.18`, MessageBus `v0.4.18`, LocalStorage `v0.4.29`.
+
+### Changed
 
 - The installer is assembled by a workflow from the components' own releases; every SHA-256 it verifies is fetched from the component's published `checksums.txt`, and the build refuses to publish with a placeholder left unfilled.
 - Gateway, MessageBus and UserService are downloaded from this distribution's releases instead of upstream tags frozen in 2024, so their Go-side fixes ship for the first time.
 - The uninstaller is a release asset; it was fetched from `get.casaos.io` with TLS verification disabled. rclone is no longer redirected to that server.
+
+### Added
+
 - Authenticated Samba shares with account management and in-place conversion, a Compose editor for installed apps, configurable in-page app launching, HTTPS on the gateway with a supplied certificate, a token required on root-privileged routes even from loopback, the device fingerprint removed from the dashboard.
 - Welcome banner names the distribution and credits upstream.
 
