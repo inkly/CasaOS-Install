@@ -2,6 +2,26 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.41] - 2026-09-04
+
+Components: CasaOS `v0.4.41`, CasaOS-UI `v0.4.32`, AppManagement `v0.4.21`, Gateway `v0.4.19`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29`.
+
+### Security
+
+- The file manager API of CasaOS core now requires a token from loopback as well; UserService and LocalStorage are unchanged.
+
+### Added
+
+- A share can be marked as a Time Machine destination.
+- The gateway can bind its public port to a single address.
+
+### Fixed
+
+- Environment values no longer gain a `$` on every save of an app's settings.
+- The internal 5-second status posts no longer flood journald.
+- The App Store survives having no populated category, shows apps with an empty architecture list, and counts categories the way it lists them.
+- The updater panel no longer prints the version twice over.
+
 ## [0.4.40] - 2026-09-04
 
 First release of the inkly distribution. Components: CasaOS `v0.4.40`, CasaOS-UI `v0.4.31`, AppManagement `v0.4.20`, Gateway `v0.4.18`, UserService `v0.4.18`, MessageBus `v0.4.18`, LocalStorage `v0.4.29`.

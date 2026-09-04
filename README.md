@@ -16,9 +16,29 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.41
+
+**Security**
+- The file manager API required no token from loopback, and loopback is not the same as root: any unprivileged local process, or a store app running with `network_mode: host`, could read, write and delete any file on the host as root. It is now behind the same token as the rest, like the Samba and package routes since v0.4.40. Reported upstream as [CasaOS #2566](https://github.com/IceWhaleTech/CasaOS/pull/2566), whose path-traversal framing is wrong and whose sanitizer is not adopted: it would break browsing `/mnt` and `/media`, i.e. every USB drive and cloud mount.
+
+**Sharing**
+- A share can be marked as a Time Machine destination. It gets Apple's SMB extensions and smbd advertises it over mDNS, so Macs on the network offer it as a backup disk. Only that share is touched, and a host missing Samba's `vfs_fruit` module is told so instead of getting a share that refuses every connection ([CasaOS #1030](https://github.com/IceWhaleTech/CasaOS/issues/1030)).
+
+**Apps**
+- A `$` in an environment variable no longer doubles on every save: `$2a$12$...` became `$$2a$$12$$...` and then `$$$$2a$$$$...`, breaking password hashes and any value containing a dollar sign ([CasaOS #1988](https://github.com/IceWhaleTech/CasaOS/issues/1988)).
+- App Store entries declaring an empty architecture list are shown rather than hidden, and the category counts now match the apps actually listed on the host.
+- The App Store no longer stops rendering when no category has any app, which happened with only a third-party store registered.
+
+**Network**
+- The gateway can bind its public port to one address instead of every interface (`address=` in `/etc/casaos/gateway.ini`), so the dashboard can be kept off an untrusted network without a firewall rule.
+
+**Logging**
+- journald no longer receives an access-log line for the internal status posts the services exchange every 5 seconds - about 17 000 lines a day of noise that buried real requests. The telemetry rate is unchanged, so the dashboard graphs keep updating ([CasaOS #2211](https://github.com/IceWhaleTech/CasaOS/issues/2211)).
+- The updater panel showed the version twice over, `vv0.4.40`.
+
 ## What is in v0.4.40
 
-The first release cut from this account. Compared with alvins82's v0.4.39:
+The first release cut from this account, kept here because it is what v0.4.41 builds on. Compared with alvins82's v0.4.39:
 
 **Sharing**
 - Samba shares can be restricted to an account. Accounts are created from the dashboard and are separate from the CasaOS login (Samba needs its own password database); they have no shell and cannot log in to the host. A share can be converted between guest and account access at any time. Every share was world-readable and world-writable before this, with files created as root — and Windows 10 and 11 refuse guest SMB entirely, so shares had stopped working for many users.
@@ -44,12 +64,12 @@ The first release cut from this account. Compared with alvins82's v0.4.39:
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.40 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.31 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.20 |
-| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.18 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.41 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.32 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.21 |
+| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.19 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.18 |
-| [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.18 |
+| [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
 | [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.29 |
 
 CasaOS-CLI and the App Store are still taken from IceWhaleTech, who continue to maintain them. The exact commits behind a release are in its `components.lock` asset.
