@@ -16,6 +16,22 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.42
+
+**The in-app updater works again — and this release is the one that repairs it.**
+
+Until now the dashboard's update panel polled the release feed of [alvins82's fork](https://github.com/alvins82/CasaOS-Install), not this one. Four files shipped by CasaOS still carried his URLs, and one of them — the setup script inside this installer's compatibility overlay — wrote them into `/etc/casaos/casaos.conf` on every install, where CasaOS prefers them over its built-in addresses. A host installed from here therefore watched a feed whose newest release was older than what it was running, said it was up to date for good, and would have fetched the other fork's installer had the update ever fired.
+
+An installation made before this release cannot repair itself, because the broken setting is exactly what the updater reads. Run the install command once by hand:
+
+```bash
+curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+```
+
+After that the updater follows this distribution on its own, and CasaOS carries a test that fails if a shipped file and the built-in addresses ever disagree again.
+
+Also in this release: the gateway's health check retried forever when a listener never answered — the countdown ran through an unsigned integer and the last decrement wrapped around — so a failed reload left it probing once a second instead of returning the error. And every component repository now has a README that describes what it actually does.
+
 ## What is in v0.4.41
 
 **Security**
@@ -64,10 +80,10 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.41 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.42 |
 | [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.32 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.21 |
-| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.19 |
+| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.18 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
 | [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.29 |

@@ -2,6 +2,15 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.42] - 2026-09-04
+
+Components: CasaOS `v0.4.42`, Gateway `v0.4.20`, CasaOS-UI `v0.4.32`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29`.
+
+### Fixed
+
+- The compatibility overlay no longer points an installed host at another fork's release feed. The setup script it carries wrote `alvins82/CasaOS-Install` URLs into `/etc/casaos/casaos.conf` on every install, so the dashboard updater polled that feed, believed the host was up to date, and would have installed that fork. Hosts installed before this release need one manual run of the install command to be repaired.
+- The gateway's self health check retried forever instead of ten times when a listener never answered.
+
 ## [0.4.41] - 2026-09-04
 
 Components: CasaOS `v0.4.41`, CasaOS-UI `v0.4.32`, AppManagement `v0.4.21`, Gateway `v0.4.19`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29`.
