@@ -1,14 +1,15 @@
 #!/usr/bin/bash
 #
 #       CasaOS Installer v0.4.36
-#   GitHub: https://github.com/alvins82/CasaOS-Install
-#   Issues: https://github.com/alvins82/CasaOS-Install/issues
+#   GitHub: https://github.com/inkly/CasaOS-Install
+#   Issues: https://github.com/inkly/CasaOS-Install/issues
+#   Upstream: https://github.com/IceWhaleTech/CasaOS
 #   Requires: bash, mv, rm, tr, grep, sed, curl/wget, tar, smartmontools, parted, ntfs-3g, net-tools
 #
 #   This script installs CasaOS to your system.
 #   Usage:
 #
-#   	$ curl -fsSL https://github.com/alvins82/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+#   	$ curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
 #
 #   In automated environments, you may want to run as root.
 #   If using curl, we recommend using the -fsSL flags.
@@ -73,22 +74,33 @@ UNAME_U="$(uname -s)"
 readonly UNAME_U
 
 readonly CASA_CONF_PATH=/etc/casaos/gateway.ini
-readonly CASA_UNINSTALL_URL="https://get.casaos.io/uninstall/v0.4.16"
 readonly CASA_UNINSTALL_PATH=/usr/bin/casaos-uninstall
-readonly CASAOS_APP_MANAGEMENT_VERSION="v0.4.19"
-readonly CASAOS_INSTALL_RELEASE_TAG="v0.4.39"
-readonly CASAOS_RELEASE_BASE_URL="https://github.com/alvins82/CasaOS-Install/releases/download/${CASAOS_INSTALL_RELEASE_TAG}"
+readonly CASAOS_APP_MANAGEMENT_VERSION="__CASAOS_APP_MANAGEMENT_VERSION__"
+readonly CASAOS_INSTALL_RELEASE_TAG="__CASAOS_RELEASE_TAG__"
+readonly CASAOS_RELEASE_BASE_URL="https://github.com/inkly/CasaOS-Install/releases/download/${CASAOS_INSTALL_RELEASE_TAG}"
 readonly CASAOS_INSTALLER_SELF_URL="${CASAOS_RELEASE_BASE_URL}/install.sh"
+readonly CASA_UNINSTALL_URL="${CASAOS_RELEASE_BASE_URL}/casaos-uninstall"
+# Component releases this installer was cut against. Every double-underscore
+# marker below is
+# written by scripts/build-release-bundle.sh from release/components.env and
+# from the checksums.txt each component publishes; nothing here is typed by
+# hand. The script as committed will refuse to run until it has been filled.
+readonly CASAOS_TAG="__CASAOS_TAG__"
+readonly CASAOS_GATEWAY_TAG="__CASAOS_GATEWAY_TAG__"
+readonly CASAOS_USER_SERVICE_TAG="__CASAOS_USER_SERVICE_TAG__"
+readonly CASAOS_MESSAGE_BUS_TAG="__CASAOS_MESSAGE_BUS_TAG__"
+readonly CASAOS_LOCAL_STORAGE_TAG="__CASAOS_LOCAL_STORAGE_TAG__"
+readonly CASAOS_UI_TAG="__CASAOS_UI_TAG__"
 readonly CASAOS_UPDATE_LOG="/var/log/casaos/upgrade.log"
 readonly CASAOS_COMPAT_OVERLAY_FILE="linux-zz-casaos-compat-overlay-${CASAOS_INSTALL_RELEASE_TAG}.tar.gz"
-readonly CASAOS_CORE_PACKAGE_FILE_PREFIX="casaos-${CASAOS_INSTALL_RELEASE_TAG}"
-readonly CASAOS_APP_MANAGEMENT_SHA256_AMD64="462958702b6756614ae070b0e0341808c075edd67dc99e06b0757e2cccc7775a"
-readonly CASAOS_APP_MANAGEMENT_SHA256_ARM64="138971b36e359aebd2f9c43d57b669c70c1e7798722dc9d0d9547bebbe0ed8a0"
-readonly CASAOS_APP_MANAGEMENT_SHA256_ARM7="2285bd724b7b5264087d565aca42eb8e7fbaabf4c0bd1e659fb3f2b1e2980c4e"
-readonly CASAOS_CORE_SHA256_AMD64="fda791737d73bee5aabf15f0fc1d5ffb5dab864f4450377d0c900422aaa305aa"
-readonly CASAOS_CORE_SHA256_ARM64="731db98e0e44e154fd7b760e9db85abf3176691c06e1165e273396f8b901cbec"
-readonly CASAOS_CORE_SHA256_ARM7="5ff989ca60549ce656fd67b19a8ca42e6be49c4bae262a94c7b6f8f8cab1f3dc"
-readonly CASAOS_COMPAT_OVERLAY_SHA256="e0d930d2fcb5a8d2866a91a6d36a6864eb1c36157bbb8501fa032814ee48c0cb"
+readonly CASAOS_CORE_PACKAGE_FILE_PREFIX="casaos-${CASAOS_TAG}"
+readonly CASAOS_APP_MANAGEMENT_SHA256_AMD64="__CASAOS_APP_MANAGEMENT_SHA256_AMD64__"
+readonly CASAOS_APP_MANAGEMENT_SHA256_ARM64="__CASAOS_APP_MANAGEMENT_SHA256_ARM64__"
+readonly CASAOS_APP_MANAGEMENT_SHA256_ARM7="__CASAOS_APP_MANAGEMENT_SHA256_ARM7__"
+readonly CASAOS_CORE_SHA256_AMD64="__CASAOS_CORE_SHA256_AMD64__"
+readonly CASAOS_CORE_SHA256_ARM64="__CASAOS_CORE_SHA256_ARM64__"
+readonly CASAOS_CORE_SHA256_ARM7="__CASAOS_CORE_SHA256_ARM7__"
+readonly CASAOS_COMPAT_OVERLAY_SHA256="__CASAOS_COMPAT_OVERLAY_SHA256__"
 
 # REQUIREMENTS CONF PATH
 # Udevil
@@ -291,14 +303,14 @@ Check_Arch() {
     esac
     Show 0 "Your hardware architecture is : $UNAME_M"
     CASA_PACKAGES=(
-        "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-Gateway/releases/download/v0.4.9-alpha4/linux-${TARGET_ARCH}-casaos-gateway-v0.4.9-alpha4.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-MessageBus/releases/download/v0.4.4-3-alpha2/linux-${TARGET_ARCH}-casaos-message-bus-v0.4.4-3-alpha2.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-UserService/releases/download/v0.4.8/linux-${TARGET_ARCH}-casaos-user-service-v0.4.8.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}alvins82/CasaOS-LocalStorage/releases/download/v0.4.28/linux-${TARGET_ARCH}-casaos-local-storage-v0.4.28.tar.gz"
-"${CASAOS_RELEASE_BASE_URL}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz"
-"${CASAOS_RELEASE_BASE_URL}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
+        "https://github.com/inkly/CasaOS-Gateway/releases/download/${CASAOS_GATEWAY_TAG}/linux-${TARGET_ARCH}-casaos-gateway-${CASAOS_GATEWAY_TAG}.tar.gz"
+"https://github.com/inkly/CasaOS-MessageBus/releases/download/${CASAOS_MESSAGE_BUS_TAG}/linux-${TARGET_ARCH}-casaos-message-bus-${CASAOS_MESSAGE_BUS_TAG}.tar.gz"
+"https://github.com/inkly/CasaOS-UserService/releases/download/${CASAOS_USER_SERVICE_TAG}/linux-${TARGET_ARCH}-casaos-user-service-${CASAOS_USER_SERVICE_TAG}.tar.gz"
+"https://github.com/inkly/CasaOS-LocalStorage/releases/download/${CASAOS_LOCAL_STORAGE_TAG}/linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz"
+"https://github.com/inkly/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_VERSION}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz"
+"https://github.com/inkly/CasaOS/releases/download/${CASAOS_TAG}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
 "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-CLI/releases/download/v0.4.4-3-alpha1/linux-${TARGET_ARCH}-casaos-cli-v0.4.4-3-alpha1.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}alvins82/CasaOS-UI/releases/download/v0.4.29/linux-all-casaos-v0.4.29.tar.gz"
+"https://github.com/inkly/CasaOS-UI/releases/download/${CASAOS_UI_TAG}/linux-all-casaos-${CASAOS_UI_TAG}.tar.gz"
 "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-AppStore/releases/download/v0.4.5/linux-all-appstore-v0.4.5.tar.gz"
 "${CASAOS_RELEASE_BASE_URL}/${CASAOS_COMPAT_OVERLAY_FILE}"
     )
@@ -622,8 +634,6 @@ Install_rclone_from_source() {
   ${sudo_cmd} wget -qO ./install.sh https://rclone.org/install.sh
   if [[ "${REGION}" = "China" ]] || [[ "${REGION}" = "CN" ]]; then
     sed -i 's/downloads.rclone.org/casaos.oss-cn-shanghai.aliyuncs.com/g' ./install.sh
-  else
-    sed -i 's/downloads.rclone.org/get.casaos.io/g' ./install.sh
   fi
   ${sudo_cmd} chmod +x ./install.sh
   ${sudo_cmd} ./install.sh || {
@@ -800,7 +810,7 @@ DownloadAndInstallCasaOS() {
     if [[ -f $PREFIX/tmp/casaos-uninstall ]]; then
         ${sudo_cmd} rm -rf "$PREFIX/tmp/casaos-uninstall"
     fi
-    ${sudo_cmd} curl -fsSLk "$CASA_UNINSTALL_URL" >"$PREFIX/tmp/casaos-uninstall"
+    ${sudo_cmd} curl -fsSL "$CASA_UNINSTALL_URL" >"$PREFIX/tmp/casaos-uninstall"
     ${sudo_cmd} cp -rf "$PREFIX/tmp/casaos-uninstall" $CASA_UNINSTALL_PATH || {
         Show 1 "Download uninstall script failed, Please check if your internet connection is working and retry."
         exit 1
@@ -853,7 +863,7 @@ Get_IPs() {
 
 # Show Welcome Banner
 Welcome_Banner() {
-    CASA_TAG=$(casaos -v)
+    CASA_TAG="$(casaos -v), distribution ${CASAOS_INSTALL_RELEASE_TAG}"
 
     echo -e "${GREEN_LINE}${aCOLOUR[1]}"
     echo -e " CasaOS ${CASA_TAG}${COLOUR_RESET} is running at${COLOUR_RESET}${GREEN_SEPARATOR}"
@@ -862,11 +872,8 @@ Welcome_Banner() {
     echo -e " Open your browser and visit the above address."
     echo -e "${GREEN_LINE}"
     echo -e ""
-    echo -e " ${aCOLOUR[2]}CasaOS Fork     : https://github.com/alvins82/CasaOS"
-    echo -e " ${aCOLOUR[2]}CasaOS Team     : https://github.com/IceWhaleTech/CasaOS#maintainers"
-    echo -e " ${aCOLOUR[2]}CasaOS Discord  : https://discord.gg/knqAbbBbeX"
-    echo -e " ${aCOLOUR[2]}Website         : https://www.casaos.io"
-    echo -e " ${aCOLOUR[2]}Online Demo     : http://demo.casaos.io"
+    echo -e " ${aCOLOUR[2]}Distribution    : https://github.com/inkly/CasaOS-Install"
+    echo -e " ${aCOLOUR[2]}Upstream        : https://github.com/IceWhaleTech/CasaOS"
     echo -e " ${aCOLOUR[2]}Special Thanks  : Sabitech  Cp0204"
     echo -e ""
     echo -e " ${COLOUR_RESET}${aCOLOUR[1]}Uninstall       ${COLOUR_RESET}: casaos-uninstall"

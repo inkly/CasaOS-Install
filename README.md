@@ -9,7 +9,7 @@ This fork preserves the normal CasaOS installer behavior for supported Linux sys
 Install the latest stable release through an OS-neutral URL with one command:
 
 ```bash
-curl -fsSL https://github.com/alvins82/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
 ```
 
 This installs the full fork release, including all Docker compatibility fixes.

@@ -1,0 +1,107 @@
+name: release
+
+# Cuts an installer release from components that have already been released
+# by their own repositories. Nothing is compiled here: the six component
+# checkouts only contribute their setup scripts to the compatibility overlay,
+# and every binary digest the installer verifies is fetched from the
+# component's own checksums.txt.
+#
+# Order of operations for a release, all under the same GitHub account:
+#   1. tag and release each component (CasaOS, CasaOS-AppManagement,
+#      CasaOS-Gateway, CasaOS-UserService, CasaOS-MessageBus,
+#      CasaOS-LocalStorage, CasaOS-UI) and wait for their assets to exist
+#   2. pin their tags and commits in release/components.env, commit
+#   3. tag this repository with CASAOS_RELEASE_TAG - this workflow runs
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Assemble and publish the installer
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout installer
+        uses: actions/checkout@v4
+
+      - name: Load component pins
+        run: |
+          set -euo pipefail
+          grep -vE '^\s*(#|$)' release/components.env >> "$GITHUB_ENV"
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            expected="$(grep '^CASAOS_RELEASE_TAG=' release/components.env | cut -d= -f2)"
+            if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+              echo "Tag ${GITHUB_REF_NAME} does not match CASAOS_RELEASE_TAG=${expected} in components.env" >&2
+              exit 1
+            fi
+          fi
+
+      - name: Checkout CasaOS
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS
+          ref: ${{ env.CASAOS_COMMIT }}
+          path: work/CasaOS
+
+      - name: Checkout CasaOS-Gateway
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS-Gateway
+          ref: ${{ env.CASAOS_GATEWAY_COMMIT }}
+          path: work/CasaOS-Gateway
+
+      - name: Checkout CasaOS-UserService
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS-UserService
+          ref: ${{ env.CASAOS_USER_SERVICE_COMMIT }}
+          path: work/CasaOS-UserService
+
+      - name: Checkout CasaOS-LocalStorage
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS-LocalStorage
+          ref: ${{ env.CASAOS_LOCAL_STORAGE_COMMIT }}
+          path: work/CasaOS-LocalStorage
+
+      - name: Checkout CasaOS-MessageBus
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS-MessageBus
+          ref: ${{ env.CASAOS_MESSAGE_BUS_COMMIT }}
+          path: work/CasaOS-MessageBus
+
+      - name: Checkout CasaOS-AppManagement
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/CasaOS-AppManagement
+          ref: ${{ env.CASAOS_APP_MANAGEMENT_COMMIT }}
+          path: work/CasaOS-AppManagement
+
+      - name: Assemble the release bundle
+        env:
+          WORKSPACE_ROOT: ${{ github.workspace }}/work
+          GITHUB_OWNER: ${{ github.repository_owner }}
+        run: scripts/build-release-bundle.sh dist
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            dist/install.sh
+            dist/install.sh.sha256
+            dist/casaos-uninstall
+            dist/linux-zz-casaos-compat-overlay-*.tar.gz
+            dist/version.json
+            dist/components.lock
+            dist/checksums.txt
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
