@@ -16,6 +16,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.44
+
+The in-app update is usable from start to finish.
+
+**The update dialog shows what the release changes.** It used to show only a link to the GitHub release, whose page was itself empty. The release manifest now carries the release's changelog section, the dialog renders it, and the same text is the body of the GitHub release. The v0.4.43 release was updated in place the same way.
+
+**The upgrade log is readable, and the update finishes.** Run from the dashboard, the installer wrote to a log file as if to a terminal: colour codes on every line and wget's dot progress by the thousand. The dialog then fed that log to a Markdown renderer, which merged the lines into paragraphs. Colours and the progress bar are now used only on a terminal, and the dashboard shows the log as text that follows its own tail. The dialog also waited for a "CasaOS upgrade successfully" line that the previous updater wrote and this installer never did, so an in-app update never reached its end in the dashboard; the installer writes it now, and "CasaOS upgrade failed" when it fails.
+
 ## What is in v0.4.43
 
 Only the dashboard changes in this release, and none of it is a feature: it is the groundwork for moving the dashboard to Vue 3, landed and shipped on the current stack first so that the move itself carries as little as possible.

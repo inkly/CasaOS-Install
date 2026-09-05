@@ -2,6 +2,19 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.44] - 2026-09-05
+
+Components: CasaOS-UI `v0.4.34`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
+
+### Fixed
+
+- An in-app update never reached its end in the dashboard. The dialog waits for "CasaOS upgrade successfully" or "CasaOS upgrade failed" in the upgrade log, lines the previous updater wrote and this installer never did. It writes them now whenever its output is not a terminal.
+- The upgrade log is readable. Run from the dashboard, the installer coloured every line and let wget print its dot progress into the log; colours and the progress bar are now used only on a terminal. The dashboard shows the log as text that follows its own tail instead of running it through the Markdown renderer.
+
+### Changed
+
+- The update dialog shows the release's changelog section, followed by the link to the release, instead of the link alone. The same section is the body of the GitHub release.
+
 ## [0.4.43] - 2026-09-05
 
 Components: CasaOS-UI `v0.4.33`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
