@@ -107,15 +107,22 @@ readonly CASAOS_COMPAT_OVERLAY_SHA256="__CASAOS_COMPAT_OVERLAY_SHA256__"
 readonly UDEVIL_CONF_PATH=/etc/udevil/udevil.conf
 readonly DEVMON_CONF_PATH=/etc/conf.d/devmon
 
-# COLORS
-readonly COLOUR_RESET='\e[0m'
-readonly aCOLOUR=(
-    '\e[38;5;154m' # green  	| Lines, bullets and separators
-    '\e[1m'        # Bold white	| Main descriptions
-    '\e[90m'       # Grey		| Credits
-    '\e[91m'       # Red		| Update notifications Alert
-    '\e[33m'       # Yellow		| Emphasis
-)
+# COLORS - none when the output is not a terminal, such as the in-app update log
+if [[ -t 1 ]]; then
+    readonly COLOUR_RESET='\e[0m'
+    readonly aCOLOUR=(
+        '\e[38;5;154m' # green  	| Lines, bullets and separators
+        '\e[1m'        # Bold white	| Main descriptions
+        '\e[90m'       # Grey		| Credits
+        '\e[91m'       # Red		| Update notifications Alert
+        '\e[33m'       # Yellow		| Emphasis
+    )
+    readonly WGET_PROGRESS='--show-progress'
+else
+    readonly COLOUR_RESET=''
+    readonly aCOLOUR=('' '' '' '' '')
+    readonly WGET_PROGRESS=''
+fi
 
 readonly GREEN_LINE=" ${aCOLOUR[0]}─────────────────────────────────────────────────────$COLOUR_RESET"
 readonly GREEN_BULLET=" ${aCOLOUR[0]}-$COLOUR_RESET"
@@ -142,15 +149,22 @@ onExit() {
     local exit_code="$1"
     local service
 
-    if ((exit_code == 0 || INSTALL_COMPLETED == 1 || ${#STOPPED_CASA_SERVICES[@]} == 0)); then
+    if ((exit_code == 0)); then
         return
     fi
 
     set +e
-    echo "CasaOS installation failed; restarting services that were stopped."
-    for service in "${STOPPED_CASA_SERVICES[@]}"; do
-        ${sudo_cmd} systemctl start "${service}" >/dev/null 2>&1 || true
-    done
+    if ((INSTALL_COMPLETED == 0 && ${#STOPPED_CASA_SERVICES[@]} > 0)); then
+        echo "CasaOS installation failed; restarting services that were stopped."
+        for service in "${STOPPED_CASA_SERVICES[@]}"; do
+            ${sudo_cmd} systemctl start "${service}" >/dev/null 2>&1 || true
+        done
+    fi
+
+    # The dashboard's update dialog waits for this line in its log.
+    if ! [[ -t 1 ]]; then
+        echo "CasaOS upgrade failed"
+    fi
 }
 
 ###############################################################################
@@ -730,7 +744,7 @@ DownloadAndInstallCasaOS() {
         for PACKAGE in "${CASA_PACKAGES[@]}"; do
             Show 2 "Downloading ${PACKAGE}..."
             GreyStart
-            ${sudo_cmd} wget -t 3 -q --show-progress -c  "${PACKAGE}" || Show 1 "Failed to download package"
+            ${sudo_cmd} wget -t 3 -q ${WGET_PROGRESS} -c "${PACKAGE}" || Show 1 "Failed to download package"
             ColorReset
         done
 
@@ -946,6 +960,11 @@ DownloadAndInstallCasaOS
 # Step 9: Check Service Status
 Check_Service_status
 INSTALL_COMPLETED=1
+
+# The dashboard's update dialog waits for this line in its log.
+if ! [[ -t 1 ]]; then
+    Show 0 "CasaOS upgrade successfully"
+fi
 
 # Step 10: Clear Term and Show Welcome Banner
 Welcome_Banner
