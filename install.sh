@@ -118,10 +118,14 @@ if [[ -t 1 ]]; then
         '\e[33m'       # Yellow		| Emphasis
     )
     readonly WGET_PROGRESS='--show-progress'
+    readonly LINE_BREAK=''
 else
     readonly COLOUR_RESET=''
     readonly aCOLOUR=('' '' '' '' '')
     readonly WGET_PROGRESS=''
+    # Two trailing spaces are a Markdown hard line break: dashboards before
+    # v0.4.34 render this log as Markdown and would run the lines together.
+    readonly LINE_BREAK='  '
 fi
 
 readonly GREEN_LINE=" ${aCOLOUR[0]}─────────────────────────────────────────────────────$COLOUR_RESET"
@@ -185,17 +189,17 @@ onExit() {
 Show() {
     # OK
     if (($1 == 0)); then
-        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[0]}  OK  $COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2"
+        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[0]}  OK  $COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2${LINE_BREAK}"
     # FAILED
     elif (($1 == 1)); then
-        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[3]}FAILED$COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2"
+        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[3]}FAILED$COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2${LINE_BREAK}"
         exit 1
     # INFO
     elif (($1 == 2)); then
-        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[0]} INFO $COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2"
+        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[0]} INFO $COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2${LINE_BREAK}"
     # NOTICE
     elif (($1 == 3)); then
-        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[4]}NOTICE$COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2"
+        echo -e "${aCOLOUR[2]}[$COLOUR_RESET${aCOLOUR[4]}NOTICE$COLOUR_RESET${aCOLOUR[2]}]$COLOUR_RESET $2${LINE_BREAK}"
     fi
 }
 
