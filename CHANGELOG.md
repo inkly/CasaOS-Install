@@ -2,6 +2,20 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.43] - 2026-09-05
+
+Components: CasaOS-UI `v0.4.33`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
+
+### Fixed
+
+- The dashboard is built for production: its JavaScript drops from 31.3 MB to 13.0 MB and no longer carries Vue's development build.
+- The dashboard bundle no longer embeds the environment of the machine that built it.
+- The memory slider snaps to the nearest mark instead of showing 256 MB for a hand-edited limit; the drop page no longer throws when left within a second.
+
+### Changed
+
+- Fifteen dashboard dependencies removed; seven abandoned Vue 2 libraries replaced by code in the repository. Groundwork for Vue 3.
+
 ## [0.4.42] - 2026-09-04
 
 Components: CasaOS `v0.4.42`, Gateway `v0.4.20`, CasaOS-UI `v0.4.32`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29`.

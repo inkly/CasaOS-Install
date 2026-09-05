@@ -16,6 +16,18 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.43
+
+Only the dashboard changes in this release, and none of it is a feature: it is the groundwork for moving the dashboard to Vue 3, landed and shipped on the current stack first so that the move itself carries as little as possible.
+
+**The dashboard is 58% smaller.** Its production build had never been built for production: `.env.production` set `NODE_ENV=prod` while the build tool tests for `production`, so every release since the fork shipped Vue's development build — warnings, the devtools hook, none of the production optimisations. The emitted JavaScript drops from 31.3 MB to 13.0 MB.
+
+**The build no longer writes the build machine's environment into the bundle.** The webpack config replaced the tool's own definitions with `JSON.stringify(process.env)`, so the JavaScript served to browsers carried the user name and home directory of whoever built it — a CI build carries the runner's. Only the four values the code reads are defined now.
+
+**Fifteen dependencies are gone.** Eight were unused; seven were abandoned Vue 2 libraries with no successor, each replaced by a few dozen lines we own — the socket plugin, the tooltips, the memory slider, the breakpoint mixin, the animation directive, the share links and the CodeMirror wrapper. Two visible differences came with that, both deliberate: the "start sharing your files" hint waits for its close button rather than vanishing on any click, and the contact bar's tooltips are anchored so the last one stays inside the window.
+
+**Fixed on the way:** an app's memory limit that is not one of the slider's marks no longer displays as 256 MB; leaving the drop page within a second of opening it no longer throws; the dashboard has its first component mount tests, 18 of them, where it had none.
+
 ## What is in v0.4.42
 
 **The in-app updater works again — and this release is the one that repairs it.**
@@ -81,7 +93,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.42 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.32 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.33 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.21 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.18 |
