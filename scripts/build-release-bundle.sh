@@ -16,7 +16,9 @@
 #   linux-zz-casaos-compat-overlay-<tag>.tar.gz
 #                         the setup scripts of the six components, plus the
 #                         release marker read by the in-app updater
-#   version.json          what the in-app updater polls
+#   version.json          what the in-app updater polls: the tag and the
+#                         CHANGELOG.md section of this release
+#   release-notes.md      that same section, the body of the GitHub release
 #   components.lock       the exact commits and tags this release was cut from
 #   checksums.txt         digests of everything above
 #
@@ -166,10 +168,43 @@ fill_installer() {
     bash -n "${target}"
 }
 
+# release_notes
+# Prints the CHANGELOG.md section of this release: its "## [x.y.z]" heading
+# up to the next release heading. The updater dialog renders it as Markdown.
+release_notes() {
+    local heading="## [${RELEASE_TAG#v}]"
+    local notes
+
+    notes="$(awk -v h="${heading}" '/^## /{p=(substr($0,1,length(h))==h)} p' "${INSTALLER_ROOT}/CHANGELOG.md")"
+    [[ -n "${notes}" ]] || fail "CHANGELOG.md has no section for ${RELEASE_TAG}."
+
+    echo "${notes}"
+}
+
+# json_string <text>
+# Prints text as a JSON string literal.
+# ponytail: escapes what Markdown prose contains; other control characters
+# would need jq, which the local machines this runs on do not have.
+json_string() {
+    local s="$1"
+
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\t'/\\t}"
+
+    printf '"%s"' "${s}"
+}
+
 write_version_manifest() {
-    printf '{\n  "version": "%s",\n  "change_log": "%s"\n}\n' \
+    local notes
+    notes="$(release_notes)"
+    printf '%s\n' "${notes}" >"${OUTPUT_DIR}/release-notes.md"
+
+    printf '{\n  "version": "%s",\n  "change_log": %s\n}\n' \
         "${RELEASE_TAG}" \
-        "https://github.com/${GITHUB_OWNER}/CasaOS-Install/releases/tag/${RELEASE_TAG}" \
+        "$(json_string "${notes}"$'\n\n'"https://github.com/${GITHUB_OWNER}/CasaOS-Install/releases/tag/${RELEASE_TAG}")" \
         >"${OUTPUT_DIR}/version.json"
 }
 
