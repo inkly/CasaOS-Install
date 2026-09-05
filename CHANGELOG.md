@@ -2,6 +2,15 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.45] - 2026-09-05
+
+Components: CasaOS-UI `v0.4.35`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
+
+### Fixed
+
+- The "App launching" row of the settings panel has the shape of its neighbours: an icon, a title line and the panel's spacing, with the current mode as its description. The settings panel and the App launching dialog are translated into French.
+- Dashboards before v0.4.34 render the upgrade log as Markdown and ran its lines together. The installer now ends each log line with a Markdown hard break when its output is not a terminal, so the one update every existing host makes through such a dashboard reads line by line.
+
 ## [0.4.44] - 2026-09-05
 
 Components: CasaOS-UI `v0.4.34`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.

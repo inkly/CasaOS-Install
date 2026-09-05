@@ -16,6 +16,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.45
+
+**The "App launching" row looks like the rest of the settings panel.** It had no icon, no title line and none of the spacing its neighbours share, so it sat against the panel's edge as a bare label and button. It now has the same structure, and its description line shows the current mode: apps open inside CasaOS, or in a new tab. The settings panel and the App launching dialog are translated into French.
+
+**The upgrade log reads line by line on the dashboards that still render it as Markdown.** Every host installed before v0.4.44 makes one update through a dashboard that turns the log's line breaks into spaces. The installer now ends each log line with a Markdown hard break when its output is not a terminal, which those dashboards render as a line break and which is invisible in the log itself.
+
 ## What is in v0.4.44
 
 The in-app update is usable from start to finish.
