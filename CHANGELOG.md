@@ -2,6 +2,13 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [Unreleased]
+
+### Fixed
+
+- Every package the installer downloads is now verified against a SHA-256 digest before extraction. Up to v0.4.48 only the CasaOS core, the AppManagement package and the compatibility overlay were checked; the Gateway, MessageBus, UserService and LocalStorage packages, the dashboard, CasaOS-CLI and the App Store were downloaded from their pinned tags and extracted without a check. The Gateway, MessageBus, UserService, LocalStorage and CasaOS-CLI digests come from the `checksums.txt` each of those releases publishes; the dashboard and App Store releases publish none, so their digests are computed from the published tarball when the release bundle is made, which pins the tarball as it was at that moment. The CasaOS-CLI and App Store tags moved from `install.sh` into `release/components.env`.
+- The release bundle script now fails when a digest cannot be fetched; before, a fetch failure inside `sed`'s argument was ignored by `set -e` and would have left an empty digest in `install.sh`.
+
 ## [0.4.50] - 2026-09-06
 
 Components: CasaOS-UI `v0.4.40`; CasaOS `v0.4.43`, AppManagement `v0.4.22`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.

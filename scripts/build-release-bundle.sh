@@ -3,11 +3,15 @@
 # Assemble a CasaOS-Install release from components that have already been
 # released by their own repositories.
 #
-# Nothing is compiled here. Each Go service and the dashboard publish their
-# own tarballs and a checksums.txt from their own release workflow; this script
-# fetches those checksums and writes them into install.sh, so the digests the
-# installer verifies against are never typed by hand. Two consecutive releases
-# once existed only to fix a mistyped digest - that is the failure this removes.
+# Nothing is compiled here. Each Go service publishes its own tarballs and a
+# checksums.txt from its own release workflow; this script fetches those
+# checksums and writes them into install.sh, so the digests the installer
+# verifies against are never typed by hand. Two consecutive releases once
+# existed only to fix a mistyped digest - that is the failure this removes.
+# IceWhale's CasaOS-CLI release publishes a checksums.txt too and is read the
+# same way. The dashboard's release and IceWhale's App Store release publish
+# none; those two digests are computed here from the tarball as published
+# (see compute_checksum).
 #
 # What it produces, in OUTPUT_DIR:
 #   install.sh            the installer with every tag and digest filled in
@@ -30,9 +34,13 @@
 #   GITHUB_OWNER             account the component releases live under
 #                            (default: inkly)
 #   CHECKSUMS_BASE_URL       where to fetch <repo>/releases/download/<tag>/checksums.txt
+#                            of the six Go services, and the dashboard tarball,
 #                            from; defaults to GitHub under GITHUB_OWNER. A
 #                            file:// URL pointing at a local tree lets the whole
 #                            thing be exercised before any release exists.
+#   UPSTREAM_BASE_URL        where to fetch IceWhale's CasaOS-CLI checksums.txt
+#                            and App Store tarball from
+#                            (default: https://github.com/IceWhaleTech)
 
 set -euo pipefail
 
@@ -42,6 +50,7 @@ readonly WORKSPACE_ROOT="${WORKSPACE_ROOT:-$(cd "${INSTALLER_ROOT}/.." && pwd)}"
 readonly COMPONENT_LOCK="${INSTALLER_ROOT}/release/components.env"
 readonly GITHUB_OWNER="${GITHUB_OWNER:-inkly}"
 readonly CHECKSUMS_BASE_URL="${CHECKSUMS_BASE_URL:-https://github.com/${GITHUB_OWNER}}"
+readonly UPSTREAM_BASE_URL="${UPSTREAM_BASE_URL:-https://github.com/IceWhaleTech}"
 
 # shellcheck source=../release/components.env
 source "${COMPONENT_LOCK}"
@@ -91,11 +100,11 @@ trap 'rm -rf "${STAGING_ROOT}"' EXIT
 
 mkdir -p "${OUTPUT_DIR}"
 
-# fetch_checksum <repo> <tag> <asset>
+# fetch_checksum <base url> <repo> <tag> <asset>
 # Prints the SHA-256 of one asset as published by that repository's release.
 fetch_checksum() {
-    local repo="$1" tag="$2" asset="$3"
-    local url="${CHECKSUMS_BASE_URL}/${repo}/releases/download/${tag}/checksums.txt"
+    local base="$1" repo="$2" tag="$3" asset="$4"
+    local url="${base}/${repo}/releases/download/${tag}/checksums.txt"
     local sum
 
     sum="$(curl -fsSL "${url}" | awk -v a="${asset}" '($2 == a || $2 == "*" a) { print $1; exit }')"
@@ -105,12 +114,38 @@ fetch_checksum() {
     echo "${sum}"
 }
 
+# compute_checksum <base url> <repo> <tag> <asset>
+# Prints the SHA-256 of one asset computed from the asset itself, for the two
+# releases that publish no checksums.txt (the dashboard, the App Store). This
+# pins the asset as it is at bundle time: an asset replaced after the bundle is
+# refused by every later install; an asset already replaced when the bundle is
+# made is pinned as found. An empty body or one that is not a gzip tarball is
+# refused rather than pinned.
+compute_checksum() {
+    local base="$1" repo="$2" tag="$3" asset="$4"
+    local url="${base}/${repo}/releases/download/${tag}/${asset}"
+    local file="${STAGING_ROOT}/${asset}"
+
+    curl -fsSL -o "${file}" "${url}" || fail "Failed to download ${url}."
+    [[ -s "${file}" ]] || fail "Empty download: ${url}"
+    tar -tzf "${file}" >/dev/null 2>&1 || fail "Not a gzip tarball: ${url}"
+
+    sha256sum "${file}" | awk '{ print $1 }'
+}
+
+# create_archive <stage dir> <output file>
+# The overlay's digest is written into install.sh, so the same tree must give
+# the same bytes wherever it is packaged: entries are sorted by name, owner and
+# group are 0 with no names, and every mtime is a fixed instant in UTC rather
+# than the local clock. GNU tar on the release runner (ubuntu-22.04) produces
+# the same bytes as GNU tar here; gzip -n leaves the name and time out of the
+# header.
 create_archive() {
     local stage_dir="$1"
     local output_file="$2"
 
-    find "${stage_dir}" -exec touch -t 202001010000 {} +
-    COPYFILE_DISABLE=1 tar --format=ustar -C "${stage_dir}" -cf - build | gzip -n >"${output_file}"
+    COPYFILE_DISABLE=1 tar --format=ustar --sort=name --owner=0 --group=0 --numeric-owner \
+        --mtime='2020-01-01 00:00:00 UTC' -C "${stage_dir}" -cf - build | gzip -n >"${output_file}"
 }
 
 package_overlay() {
@@ -135,9 +170,12 @@ package_overlay() {
 # fill_installer <output install.sh>
 # Every value install.sh needs at run time is a placeholder in the committed
 # script and is written here from components.env and the published checksums.
+# Each digest goes through an assignment, not straight into sed's argument: a
+# failed command substitution inside an argument is not a failure of the
+# command under set -e, and would have written an empty digest.
 fill_installer() {
     local target="$1"
-    local key value
+    local key value sum
 
     install -m 0755 "${INSTALLER_ROOT}/install.sh" "${target}"
 
@@ -150,14 +188,32 @@ fill_installer() {
     overlay_sum="$(sha256sum "${OUTPUT_DIR}/${OVERLAY_FILE}" | awk '{ print $1 }')"
     sed -i "s|__CASAOS_COMPAT_OVERLAY_SHA256__|${overlay_sum}|g" "${target}"
 
-    local arch
+    # base url, placeholder stem, repository, tag, asset name stem: one line
+    # per package released per architecture with a checksums.txt
+    local spec base stem repo tag name
+    local arch upper
     for arch in amd64 arm64 arm-7; do
-        local upper="${arch//-/}"
+        upper="${arch//-/}"
         upper="${upper^^}"
 
-        sed -i "s|__CASAOS_APP_MANAGEMENT_SHA256_${upper}__|$(fetch_checksum CasaOS-AppManagement "${CASAOS_APP_MANAGEMENT_VERSION}" "linux-${arch}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz")|g" "${target}"
-        sed -i "s|__CASAOS_CORE_SHA256_${upper}__|$(fetch_checksum CasaOS "${CASAOS_TAG}" "linux-${arch}-casaos-${CASAOS_TAG}.tar.gz")|g" "${target}"
+        for spec in \
+            "${CHECKSUMS_BASE_URL} CASAOS_GATEWAY_SHA256 CasaOS-Gateway ${CASAOS_GATEWAY_TAG} casaos-gateway" \
+            "${CHECKSUMS_BASE_URL} CASAOS_MESSAGE_BUS_SHA256 CasaOS-MessageBus ${CASAOS_MESSAGE_BUS_TAG} casaos-message-bus" \
+            "${CHECKSUMS_BASE_URL} CASAOS_USER_SERVICE_SHA256 CasaOS-UserService ${CASAOS_USER_SERVICE_TAG} casaos-user-service" \
+            "${CHECKSUMS_BASE_URL} CASAOS_LOCAL_STORAGE_SHA256 CasaOS-LocalStorage ${CASAOS_LOCAL_STORAGE_TAG} casaos-local-storage" \
+            "${CHECKSUMS_BASE_URL} CASAOS_APP_MANAGEMENT_SHA256 CasaOS-AppManagement ${CASAOS_APP_MANAGEMENT_VERSION} casaos-app-management" \
+            "${CHECKSUMS_BASE_URL} CASAOS_CORE_SHA256 CasaOS ${CASAOS_TAG} casaos" \
+            "${UPSTREAM_BASE_URL} CASAOS_CLI_SHA256 CasaOS-CLI ${CASAOS_CLI_TAG} casaos-cli"; do
+            read -r base stem repo tag name <<<"${spec}"
+            sum="$(fetch_checksum "${base}" "${repo}" "${tag}" "linux-${arch}-${name}-${tag}.tar.gz")"
+            sed -i "s|__${stem}_${upper}__|${sum}|g" "${target}"
+        done
     done
+
+    sum="$(compute_checksum "${CHECKSUMS_BASE_URL}" CasaOS-UI "${CASAOS_UI_TAG}" "linux-all-casaos-${CASAOS_UI_TAG}.tar.gz")"
+    sed -i "s|__CASAOS_UI_SHA256__|${sum}|g" "${target}"
+    sum="$(compute_checksum "${UPSTREAM_BASE_URL}" CasaOS-AppStore "${CASAOS_APPSTORE_TAG}" "linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz")"
+    sed -i "s|__CASAOS_APPSTORE_SHA256__|${sum}|g" "${target}"
 
     if grep -qE '__[A-Z][A-Z0-9_]*__' "${target}"; then
         echo "Unfilled placeholders remain in install.sh:" >&2
