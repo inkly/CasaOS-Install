@@ -160,7 +160,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
 | [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.40 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.23 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.24 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |

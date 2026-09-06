@@ -4,7 +4,7 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ## [0.4.51] - 2026-09-06
 
-Components: AppManagement `v0.4.23`; CasaOS `v0.4.43`, CasaOS-UI `v0.4.40`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
+Components: AppManagement `v0.4.24`; CasaOS `v0.4.43`, CasaOS-UI `v0.4.40`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
 
 ### Fixed
 
