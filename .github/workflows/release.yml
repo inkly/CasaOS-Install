@@ -5,7 +5,9 @@ name: release
 # checkouts only contribute their setup scripts to the compatibility overlay,
 # and every binary digest the installer verifies is fetched from the
 # component's own checksums.txt, or computed from the published tarball for
-# the two releases that have none (the dashboard and the App Store).
+# the two releases that have none (the dashboard and the App Store). The App
+# Store seed is mirrored from IceWhale's release into our own, so a new install
+# depends only on assets we publish.
 #
 # Order of operations for a release, all under the same GitHub account:
 #   1. tag and release each component (CasaOS, CasaOS-AppManagement,
@@ -101,6 +103,7 @@ jobs:
             dist/install.sh.sha256
             dist/casaos-uninstall
             dist/linux-zz-casaos-compat-overlay-*.tar.gz
+            dist/linux-all-appstore-*.tar.gz
             dist/version.json
             dist/components.lock
             dist/checksums.txt

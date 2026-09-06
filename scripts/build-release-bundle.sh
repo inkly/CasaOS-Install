@@ -8,16 +8,26 @@
 # checksums and writes them into install.sh, so the digests the installer
 # verifies against are never typed by hand. Two consecutive releases once
 # existed only to fix a mistyped digest - that is the failure this removes.
-# IceWhale's CasaOS-CLI release publishes a checksums.txt too and is read the
-# same way. The dashboard's release and IceWhale's App Store release publish
-# none; those two digests are computed here from the tarball as published
-# (see compute_checksum).
+# The dashboard's release and IceWhale's App Store release publish none; those
+# two digests are computed here from the tarball as published (see
+# compute_checksum).
+#
+# The App Store seed is the one asset still fetched from IceWhale, and only at
+# release time: it is the snapshot the installer needs for a new box to come up
+# with a populated store. It is mirrored into OUTPUT_DIR, published as an asset
+# of our own release, and pinned by the digest of the copy we publish, so a new
+# install no longer depends on IceWhale's release still existing. This changes
+# nothing about who curates the catalogue: AppManagement keeps polling
+# IceWhale's live store feed at run time.
 #
 # What it produces, in OUTPUT_DIR:
 #   install.sh            the installer with every tag and digest filled in
 #   casaos-uninstall      the uninstaller, served from our release rather than
 #                         from a third party's web server; its digest is
 #                         written into install.sh like the packages'
+#   linux-all-appstore-<tag>.tar.gz
+#                         IceWhale's App Store seed as published, mirrored so a
+#                         new install does not depend on their release
 #   linux-zz-casaos-compat-overlay-<tag>.tar.gz
 #                         the setup scripts of the six components, plus the
 #                         release marker read by the in-app updater
@@ -39,8 +49,7 @@
 #                            from; defaults to GitHub under GITHUB_OWNER. A
 #                            file:// URL pointing at a local tree lets the whole
 #                            thing be exercised before any release exists.
-#   UPSTREAM_BASE_URL        where to fetch IceWhale's CasaOS-CLI checksums.txt
-#                            and App Store tarball from
+#   UPSTREAM_BASE_URL        where to fetch the App Store seed tarball from
 #                            (default: https://github.com/IceWhaleTech)
 
 set -euo pipefail
@@ -59,6 +68,7 @@ source "${COMPONENT_LOCK}"
 readonly RELEASE_TAG="${CASAOS_RELEASE_TAG}"
 readonly OUTPUT_DIR="${1:-${INSTALLER_ROOT}/dist}"
 readonly OVERLAY_FILE="linux-zz-casaos-compat-overlay-${RELEASE_TAG}.tar.gz"
+readonly APPSTORE_SEED_FILE="linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz"
 
 readonly COMPONENT_DIRS=(
     "CasaOS-Gateway:${CASAOS_GATEWAY_COMMIT}"
@@ -115,17 +125,18 @@ fetch_checksum() {
     echo "${sum}"
 }
 
-# compute_checksum <base url> <repo> <tag> <asset>
+# compute_checksum <base url> <repo> <tag> <asset> [keep dir]
 # Prints the SHA-256 of one asset computed from the asset itself, for the two
 # releases that publish no checksums.txt (the dashboard, the App Store). This
 # pins the asset as it is at bundle time: an asset replaced after the bundle is
 # refused by every later install; an asset already replaced when the bundle is
 # made is pinned as found. An empty body or one that is not a gzip tarball is
-# refused rather than pinned.
+# refused rather than pinned. A keep directory leaves the download there to be
+# republished, so the digest pinned is the digest of the copy we serve.
 compute_checksum() {
-    local base="$1" repo="$2" tag="$3" asset="$4"
+    local base="$1" repo="$2" tag="$3" asset="$4" keep_dir="${5:-${STAGING_ROOT}}"
     local url="${base}/${repo}/releases/download/${tag}/${asset}"
-    local file="${STAGING_ROOT}/${asset}"
+    local file="${keep_dir}/${asset}"
 
     curl -fsSL -o "${file}" "${url}" || fail "Failed to download ${url}."
     [[ -s "${file}" ]] || fail "Empty download: ${url}"
@@ -208,8 +219,7 @@ fill_installer() {
             "${CHECKSUMS_BASE_URL} CASAOS_USER_SERVICE_SHA256 CasaOS-UserService ${CASAOS_USER_SERVICE_TAG} casaos-user-service" \
             "${CHECKSUMS_BASE_URL} CASAOS_LOCAL_STORAGE_SHA256 CasaOS-LocalStorage ${CASAOS_LOCAL_STORAGE_TAG} casaos-local-storage" \
             "${CHECKSUMS_BASE_URL} CASAOS_APP_MANAGEMENT_SHA256 CasaOS-AppManagement ${CASAOS_APP_MANAGEMENT_VERSION} casaos-app-management" \
-            "${CHECKSUMS_BASE_URL} CASAOS_CORE_SHA256 CasaOS ${CASAOS_TAG} casaos" \
-            "${UPSTREAM_BASE_URL} CASAOS_CLI_SHA256 CasaOS-CLI ${CASAOS_CLI_TAG} casaos-cli"; do
+            "${CHECKSUMS_BASE_URL} CASAOS_CORE_SHA256 CasaOS ${CASAOS_TAG} casaos"; do
             read -r base stem repo tag name <<<"${spec}"
             sum="$(fetch_checksum "${base}" "${repo}" "${tag}" "linux-${arch}-${name}-${tag}.tar.gz")"
             sed -i "s|__${stem}_${upper}__|${sum}|g" "${target}"
@@ -218,7 +228,7 @@ fill_installer() {
 
     sum="$(compute_checksum "${CHECKSUMS_BASE_URL}" CasaOS-UI "${CASAOS_UI_TAG}" "linux-all-casaos-${CASAOS_UI_TAG}.tar.gz")"
     sed -i "s|__CASAOS_UI_SHA256__|${sum}|g" "${target}"
-    sum="$(compute_checksum "${UPSTREAM_BASE_URL}" CasaOS-AppStore "${CASAOS_APPSTORE_TAG}" "linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz")"
+    sum="$(compute_checksum "${UPSTREAM_BASE_URL}" CasaOS-AppStore "${CASAOS_APPSTORE_TAG}" "${APPSTORE_SEED_FILE}" "${OUTPUT_DIR}")"
     sed -i "s|__CASAOS_APPSTORE_SHA256__|${sum}|g" "${target}"
 
     if grep -qE '__[A-Z][A-Z0-9_]*__' "${target}"; then
@@ -273,7 +283,7 @@ write_version_manifest() {
 write_checksums() {
     (
         cd "${OUTPUT_DIR}"
-        sha256sum "${OVERLAY_FILE}" install.sh casaos-uninstall components.lock version.json >checksums.txt
+        sha256sum "${OVERLAY_FILE}" "${APPSTORE_SEED_FILE}" install.sh casaos-uninstall components.lock version.json >checksums.txt
         sha256sum install.sh >install.sh.sha256
     )
 }

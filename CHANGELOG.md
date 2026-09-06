@@ -2,6 +2,16 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [Unreleased]
+
+### Changed
+
+- The App Store seed the installer downloads is now an asset of the installer's own release. It is still IceWhale's snapshot, fetched from their release when the bundle is built, republished unchanged and pinned by the digest of the copy we serve. This mirrors a snapshot and changes nothing about who curates the catalogue: AppManagement still polls IceWhale's live store feed, the apps and their icons are still theirs. What it removes is the install-time dependency on IceWhale's release still existing — until now, the day that asset went away every new install failed at `wget`.
+
+### Removed
+
+- IceWhale's CasaOS-CLI package. It placed `/usr/bin/casaos-cli` and a bash completion, and nothing in the distribution ever invoked either: no service, setup script, migration script, systemd unit or dashboard call. It was the second of the two IceWhale release assets a new install could not come up without. On a box that already has it, the file stays where it is; it is no longer listed in the install manifest, so `casaos-uninstall` no longer removes it.
+
 ## [0.4.53] - 2026-09-06
 
 Components: CasaOS-UI `v0.4.42`; CasaOS `v0.4.43`, AppManagement `v0.4.24`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.30` unchanged.

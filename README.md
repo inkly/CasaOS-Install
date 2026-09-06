@@ -14,7 +14,7 @@ Supported architectures: amd64, arm64 and arm/v7. The installer detects the dist
 
 Running the same command on an existing install upgrades it. Installs made from alvins82's or IceWhale's installers can be migrated the same way; the in-app updater then follows this distribution's releases. Do not use `get.casaos.io/update` afterwards: it installs IceWhale's frozen component bundle.
 
-Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
+Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
 ## What is in v0.4.53
 
@@ -34,7 +34,7 @@ On a virtual machine — a QEMU disk under Proxmox, for instance — the storage
 
 **Every package the installer downloads is digest-checked, and a failed app start after a `.env` change rolls back.**
 
-Up to v0.4.50 `install.sh` verified a SHA-256 digest on three of the ten packages it downloads: the CasaOS core, AppManagement and the compatibility overlay. It now verifies all ten before anything is extracted or any service stopped: the six inkly components and IceWhale's CasaOS-CLI against the `checksums.txt` their releases publish, the dashboard and the App Store — whose releases publish none — against a digest computed from the package as published at release time. The digests are written into `install.sh` by the release workflow; a package whose digest does not match stops the install with `Checksum verification failed`. The release workflow also fails, instead of writing an empty digest, when a checksum cannot be fetched, and the compatibility overlay is built reproducibly, so its digest no longer depends on the machine that packed it.
+Up to v0.4.50 `install.sh` verified a SHA-256 digest on three of the ten packages it downloaded: the CasaOS core, AppManagement and the compatibility overlay. It now verifies all nine before anything is extracted or any service stopped: the six inkly components against the `checksums.txt` their releases publish, the dashboard and the App Store seed — whose releases publish none — against a digest computed from the package as published at release time. The digests are written into `install.sh` by the release workflow; a package whose digest does not match stops the install with `Checksum verification failed`. The release workflow also fails, instead of writing an empty digest, when a checksum cannot be fetched, and the compatibility overlay is built reproducibly, so its digest no longer depends on the machine that packed it.
 
 In AppManagement, a `.env` or compose change whose app then fails to start puts the previous `docker-compose.yml` and `.env` back and starts the previous app from them; before, the new files stayed on disk while the previous containers were gone. Every other component is where v0.4.50 left it.
 
@@ -180,7 +180,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
 | [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.30 |
 
-CasaOS-CLI and the App Store are still taken from IceWhaleTech, who continue to maintain them. The exact commits behind a release are in its `components.lock` asset.
+The installer downloads every package from an inkly release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 
 ## How a release is made
 
@@ -188,9 +188,9 @@ Nothing is built on a workstation.
 
 1. Each component is tagged and its own workflow publishes tarballs and, except the dashboard, a `checksums.txt`.
 2. Those tags and commits are pinned in [`release/components.env`](release/components.env).
-3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches the published digest of every package that has one, computes the digest of the dashboard and App Store packages from the packages themselves and of the uninstall script it ships, writes every tag and digest into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
+3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches the published digest of every package that has one, mirrors the App Store seed, computes the digest of the dashboard and of the mirrored seed from the packages themselves and of the uninstall script it ships, writes every tag and digest into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
 
-`scripts/build-release-bundle.sh` is that step. It can be run locally: `WORKSPACE_ROOT` names the directory holding the six component checkouts at the pinned commits, `CHECKSUMS_BASE_URL` is where the six components' `checksums.txt` and the dashboard tarball are downloaded from, and `UPSTREAM_BASE_URL` is where CasaOS-CLI's `checksums.txt` and the App Store tarball are downloaded from. Both default to GitHub; a `file://` URL pointing at a local tree laid out as `<repo>/releases/download/<tag>/` exercises the whole chain before any release exists.
+`scripts/build-release-bundle.sh` is that step. It can be run locally: `WORKSPACE_ROOT` names the directory holding the six component checkouts at the pinned commits, `CHECKSUMS_BASE_URL` is where the six components' `checksums.txt` and the dashboard tarball are downloaded from, and `UPSTREAM_BASE_URL` is where the App Store seed tarball is downloaded from. Both default to GitHub; a `file://` URL pointing at a local tree laid out as `<repo>/releases/download/<tag>/` exercises the whole chain before any release exists.
 
 ## Uninstall
 
