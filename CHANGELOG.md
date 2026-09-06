@@ -2,6 +2,22 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.47] - 2026-09-06
+
+Components: CasaOS-UI `v0.4.37`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
+
+### Added
+
+- A dark theme for the dashboard: light, dark or follow the system, chosen in the settings panel.
+
+### Changed
+
+- The dashboard runs on Vue 3.5 with Buefy 3.1 and Bulma 1.0, same components, same look.
+
+### Fixed
+
+- Links back to the palette's blue; switch focus rings and select placeholders restored; the storage widget's disk summary no longer truncated to the disk name in 28 languages; the app installer's port field accepts ports again.
+
 ## [0.4.46] - 2026-09-06
 
 Components: CasaOS-UI `v0.4.36`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.

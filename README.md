@@ -16,6 +16,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.47
+
+**A dark theme, and the dashboard on Vue 3.**
+
+Appearance is a new row in the dashboard's settings: light, dark, or follow the system — the default when nothing has been chosen. The choice is kept in the browser and applied before the first paint, so there is no flash, and the login and welcome pages honour it. The glass cards and widgets were already dark and stay identical in both themes; what changes is the chrome over them: the top bar, modals, dropdowns, forms, toasts, the file browser, the App Store, the storage manager ([CasaOS #938](https://github.com/IceWhaleTech/CasaOS/issues/938), the most-requested feature upstream never shipped).
+
+Under it, the dashboard moved from Vue 2.7 — end of life since December 2023 — to Vue 3.5, with Buefy 3.1 and Bulma 1.0, keeping the same components and the same look. The light theme was compared declaration by declaration against v0.4.46 and did not move. Three things were fixed on the way that only a browser could show: every link had darkened with Bulma 1's contrast defaults, the focus ring of switches and the placeholder of empty selects had vanished, and the storage widget's disk summary showed only the disk name in 28 languages.
+
+This is the largest change the dashboard has had since the fork. It was exercised in a served build against stubbed APIs, not on a live CasaOS; if something on your box behaves differently from v0.4.46, say so in an issue and downgrade with the previous installer while it is looked at.
+
 ## What is in v0.4.46
 
 **The dashboard is fully translated into French.** Everything this distribution added since the fork, from the system package updates and merged storage to the Compose editor, the share accounts and the Time Machine shares, was still shown in English on a French dashboard: seventy-six strings, now translated.
@@ -111,7 +121,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.42 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.33 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.37 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.21 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.18 |
