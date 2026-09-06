@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.49] - 2026-09-06
+
+Components: CasaOS-UI `v0.4.39`; CasaOS `v0.4.43`, AppManagement `v0.4.22`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
+
+### Fixed
+
+- After an update the user was signed out again a second or two after signing in on the new services: the update dialog's sign-out went through the router guard, whose API call settled only after the next login. The dialog now clears the session locally and reloads the page once the backend answers, each probe bounded to three seconds, the reload once.
+
 ## [0.4.48] - 2026-09-06
 
 Components: CasaOS `v0.4.43`, CasaOS-UI `v0.4.38`, AppManagement `v0.4.22`, UserService `v0.4.19`; Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.

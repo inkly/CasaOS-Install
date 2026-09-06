@@ -16,6 +16,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 The CasaOS core and AppManagement packages and the compatibility overlay are verified against a SHA-256 digest before extraction; the other components are downloaded from their pinned tags without a digest check yet. The digests are written into `install.sh` at release time from the checksums those components publish; none is typed by hand.
 
+## What is in v0.4.49
+
+**One fix, to the update dialog; dashboard only.**
+
+After an update on v0.4.48 the user landed on the login page, signed in on the new services, saw the home page with the changelog, and was thrown back to the login page a second or two later. The update dialog signed out through the router, whose guard awaits an API call before it navigates; started while the services restarted, that call settled only after the next login, and the guard then removed the fresh tokens. The upgrade rotates the token keys, so the session is over either way: the dialog now clears it locally and reloads the page, into the UI just installed, once `/v1/users/status` answers again, or after two minutes regardless; each probe is given three seconds, and the reload happens once. Every other component is where v0.4.48 left it.
+
 ## What is in v0.4.48
 
 **Two-factor authentication on the account, a `.env` per installed app, and a lint gate on the dashboard.**
@@ -137,7 +143,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.38 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.39 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.22 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
