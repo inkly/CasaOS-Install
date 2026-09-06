@@ -14,7 +14,7 @@ Supported architectures: amd64, arm64 and arm/v7. The installer detects the dist
 
 Running the same command on an existing install upgrades it. Installs made from alvins82's or IceWhale's installers can be migrated the same way; the in-app updater then follows this distribution's releases. Do not use `get.casaos.io/update` afterwards: it installs IceWhale's frozen component bundle.
 
-Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
+The CasaOS core and AppManagement packages and the compatibility overlay are verified against a SHA-256 digest before extraction; the other components are downloaded from their pinned tags without a digest check yet. The digests are written into `install.sh` at release time from the checksums those components publish; none is typed by hand.
 
 ## What is in v0.4.48
 
@@ -152,7 +152,7 @@ Nothing is built on a workstation.
 
 1. Each component is tagged and its own workflow publishes tarballs and a `checksums.txt`.
 2. Those tags and commits are pinned in [`release/components.env`](release/components.env).
-3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches each component's published digests, writes every tag and digest into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
+3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches the published digests of the core and AppManagement packages, writes every tag and those digests into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
 
 `scripts/build-release-bundle.sh` is that step; it can be run locally with `CHECKSUMS_BASE_URL` pointing at a directory of checksum files to exercise the whole chain before any release exists.
 
