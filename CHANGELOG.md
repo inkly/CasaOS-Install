@@ -2,7 +2,10 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
-## [Unreleased]
+## [0.4.54] - 2026-09-07
+
+Components: CasaOS `v0.4.44`, CasaOS-UI `v0.4.43`, AppManagement `v0.4.25`, Gateway `v0.4.21`, UserService `v0.4.20`, LocalStorage `v0.4.31`; MessageBus `v0.4.19` unchanged.
+
 
 ### Fixed
 
@@ -11,10 +14,13 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ### Changed
 
+- Four components generate their message-bus client from this distribution's own tag instead of IceWhale's live `main` branch, and LocalStorage's coverage job no longer runs a reusable workflow hosted in an IceWhale repository.
 - The App Store seed the installer downloads is now an asset of the installer's own release. It is still IceWhale's snapshot, fetched from their release when the bundle is built, republished unchanged and pinned by the digest of the copy we serve. This mirrors a snapshot and changes nothing about who curates the catalogue: AppManagement still polls IceWhale's live store feed, the apps and their icons are still theirs. What it removes is the install-time dependency on IceWhale's release still existing — until now, the day that asset went away every new install failed at `wget`.
 
 ### Removed
 
+- The geo-IP call five components made on every install and upgrade: `__get_download_domain` curled `ipconfig.io/country` and `ifconfig.io/country_code` to pick a download mirror by country, at the top of the migration script, before it knew whether a migration applied. The download domain is a constant now.
+- The dashboard's last two npm dependencies published by IceWhale. The App Store and compose client is generated from this distribution's own OpenAPI document and committed; the other had no import site.
 - The geo-IP call `install.sh` made on every install and upgrade. `Get_Download_Url_Domain` curled `ipconfig.io/country`, falling back to `ifconfig.io/country_code`, as the first step of the run, to decide whether the App Store catalogue should be read from GitHub or from IceWhale's Aliyun mirror. Its only remaining reader was that one substitution: the mirror is now chosen explicitly with `CASA_DOWNLOAD_DOMAIN` on the install line, and nothing is contacted to guess it.
 - IceWhale's `update.sh` and the stale `casaos-tags`, both at the repository root. `update.sh` installed IceWhale's `v0.4.4` component bundle from their releases; `casaos-tags` pinned component versions frozen since `v0.4.31`. Nothing in this repository reads either and the release workflow publishes neither, so the only channel that ever served them was GitHub Pages under the `CNAME` IceWhale committed in 2021 - a domain this distribution does not own.
 - IceWhale's CasaOS-CLI package. It placed `/usr/bin/casaos-cli` and a bash completion, and nothing in the distribution ever invoked either: no service, setup script, migration script, systemd unit or dashboard call. It was the second of the two IceWhale release assets a new install could not come up without. On a box that already has it, the file stays where it is; it is no longer listed in the install manifest, so `casaos-uninstall` no longer removes it.

@@ -16,6 +16,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.54
+
+**Nothing this distribution installs asks a third party where you are, and the dashboard takes no package from IceWhale.**
+
+Five of the six components shipped a migration script that called `ipconfig.io/country`, falling back to `ifconfig.io/country_code`, to pick a download mirror by country. The call sat at the top of the script, so it ran on every install and every upgrade — before the script had even decided whether a migration applied, which on a current box it does not. Two third parties therefore learned the country of every machine this distribution was installed on, in a distribution whose whole point is that it removed the phone-home beacon. The call is gone, in all five, and the download domain is a constant: not a setting either, because what it points at is downloaded and run as root without verification.
+
+The dashboard's App Store and compose client used to come from `@icewhale/casaos-appmanagement-openapi` on npm, published by IceWhale, and until this week it was requested as `latest` — whatever the registry served at build time. It is now generated from this distribution's own OpenAPI document and committed to the repository: the same operations, argument for argument, plus the two `.env` routes the published package never had. A second IceWhale package, which no file imported, is gone. Four components also stopped generating their message-bus client from IceWhale's live `main` branch at build time, and one stopped running a reusable CI workflow hosted in an IceWhale repository.
+
+What stays, deliberately: the App Store catalogue and its icons are still IceWhale's, and so is the cloud-drive OAuth redirect. Forking the catalogue means taking over the review of compose files that run as root, and it is still maintained daily at IceWhale's expense.
+
 ## What is in v0.4.53
 
 **The two-factor QR code is scannable again; dashboard only.**
@@ -172,13 +182,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.42 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.24 |
-| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
-| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.44 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.43 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.25 |
+| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.21 |
+| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.20 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
-| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.30 |
+| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.31 |
 
 The installer downloads every package from an inkly release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 
