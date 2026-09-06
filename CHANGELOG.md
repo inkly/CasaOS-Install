@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.53] - 2026-09-06
+
+Components: CasaOS-UI `v0.4.42`; CasaOS `v0.4.43`, AppManagement `v0.4.24`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.30` unchanged.
+
+### Fixed
+
+- The QR code on the two-factor enrolment screen rendered as an unscannable 192x28 band: the account panel is mounted inside the top bar's dropdown, where Bulma caps an image at 1.75rem. It is square at its natural size again, with the four-module quiet zone the QR specification asks for.
+
 ## [0.4.52] - 2026-09-06
 
 Components: LocalStorage `v0.4.30`, CasaOS-UI `v0.4.41`; CasaOS `v0.4.43`, AppManagement `v0.4.24`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19` unchanged.

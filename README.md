@@ -16,6 +16,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.53
+
+**The two-factor QR code is scannable again; dashboard only.**
+
+On the two-factor enrolment screen the QR code rendered as a 192x28 band of noise, impossible to scan. The account panel is mounted inside the top bar's dropdown, and Bulma caps any image inside a navbar item at 1.75rem: the height was clamped to 28 pixels while the `width="192"` attribute held the width, so the code came out five to seven times wider than tall. The cap is lifted for that image, which is square again at its natural size, and its quiet zone went from one module to the four the QR specification asks for. Verified by decoding the rendered pixels back to the enrolment URL in both themes, at desktop and mobile widths, and at 1.25x, 1.5x and 2x display scaling. Every other component is where v0.4.52 left it.
+
 ## What is in v0.4.52
 
 **A disk without SMART data is no longer shown as damaged, a machine without sensors shows no CPU wattage, and the uninstall script is digest-checked.**
@@ -167,7 +173,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.41 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.42 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.24 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
