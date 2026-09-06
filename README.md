@@ -16,6 +16,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 The CasaOS core and AppManagement packages and the compatibility overlay are verified against a SHA-256 digest before extraction; the other components are downloaded from their pinned tags without a digest check yet. The digests are written into `install.sh` at release time from the checksums those components publish; none is typed by hand.
 
+## What is in v0.4.50
+
+**The dashboard points at this distribution, and stops talking to the upstream blog; dashboard only.**
+
+The contact bar at the bottom right keeps two links: the feedback icon opens the issues of [inkly/CasaOS](https://github.com/inkly/CasaOS/issues), the GitHub icon opens that repository. The Discord link, the in-app feedback form — which built a prefilled issue for IceWhale's repository — and the share dialog are gone, and so are the two remaining Discord invitations, in the smart-home block and in the app installer's AutoFill hint, which point at the issues now.
+
+The news feed from the upstream blog is removed: the brand bar fetched an RSS feed from blog-casaos.zimaspace.com and scrolled the latest posts, behind a "Show news feed from CasaOS Blog" switch in the settings menu and a consent dialog after the first login. The switch, the dialogs, the setting and the RSS dependency are gone; nothing in the dashboard contacts that blog any more. Every other component is where v0.4.49 left it.
+
 ## What is in v0.4.49
 
 **One fix, to the update dialog; dashboard only.**
@@ -143,7 +151,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.39 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.40 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.22 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |

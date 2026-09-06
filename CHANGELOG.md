@@ -2,6 +2,19 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.50] - 2026-09-06
+
+Components: CasaOS-UI `v0.4.40`; CasaOS `v0.4.43`, AppManagement `v0.4.22`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
+
+### Changed
+
+- The dashboard's contact bar keeps two links, to the issues and the repository of inkly/CasaOS; the smart-home block and the app installer's AutoFill hint point at the issues instead of the upstream Discord.
+
+### Removed
+
+- The contact bar's Discord link, in-app feedback form and share dialog.
+- The news feed from the upstream blog (an RSS feed fetched from blog-casaos.zimaspace.com), its settings switch, its consent dialogs and the RSS dependency.
+
 ## [0.4.49] - 2026-09-06
 
 Components: CasaOS-UI `v0.4.39`; CasaOS `v0.4.43`, AppManagement `v0.4.22`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
