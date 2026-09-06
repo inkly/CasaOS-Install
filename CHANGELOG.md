@@ -15,6 +15,7 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ### Removed
 
+- The geo-IP call `install.sh` made on every install and upgrade. `Get_Download_Url_Domain` curled `ipconfig.io/country`, falling back to `ifconfig.io/country_code`, as the first step of the run, to decide whether the App Store catalogue should be read from GitHub or from IceWhale's Aliyun mirror. Its only remaining reader was that one substitution: the mirror is now chosen explicitly with `CASA_DOWNLOAD_DOMAIN` on the install line, and nothing is contacted to guess it.
 - IceWhale's `update.sh` and the stale `casaos-tags`, both at the repository root. `update.sh` installed IceWhale's `v0.4.4` component bundle from their releases; `casaos-tags` pinned component versions frozen since `v0.4.31`. Nothing in this repository reads either and the release workflow publishes neither, so the only channel that ever served them was GitHub Pages under the `CNAME` IceWhale committed in 2021 - a domain this distribution does not own.
 - IceWhale's CasaOS-CLI package. It placed `/usr/bin/casaos-cli` and a bash completion, and nothing in the distribution ever invoked either: no service, setup script, migration script, systemd unit or dashboard call. It was the second of the two IceWhale release assets a new install could not come up without. On a box that already has it, the file stays where it is; it is no longer listed in the install manifest, so `casaos-uninstall` no longer removes it.
 

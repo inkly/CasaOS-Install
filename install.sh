@@ -156,7 +156,10 @@ CASAOS_APP_MANAGEMENT_SHA256=""
 CASAOS_CORE_SHA256=""
 TMP_ROOT=/tmp/casaos-installer
 REGION="UNKNOWN"
-CASA_DOWNLOAD_DOMAIN="https://github.com/"
+# Where the App Store catalogue is fetched from. Set it on the install line to use a
+# mirror -- curl <install.sh> | sudo CASA_DOWNLOAD_DOMAIN=https://mirror/ bash -- rather
+# than being geo-located: this script used to curl a geo-IP service to guess it.
+CASA_DOWNLOAD_DOMAIN="${CASA_DOWNLOAD_DOMAIN:-https://github.com/}"
 STOPPED_CASA_SERVICES=()
 INSTALL_COMPLETED=0
 
@@ -300,19 +303,6 @@ exist_file() {
 ###############################################################################
 
 
-
-# 0 Get download url domain
-# To solve the problem that Chinese users cannot access github.
-Get_Download_Url_Domain() {
-    # Use ipconfig.io/country and https://ifconfig.io/country_code to get the country code
-    REGION=$(${sudo_cmd} curl --connect-timeout 2 -s ipconfig.io/country || echo "")
-    if [ "${REGION}" = "" ]; then
-       REGION=$(${sudo_cmd} curl --connect-timeout 2 -s https://ifconfig.io/country_code || echo "")
-    fi
-    if [[ "${REGION}" = "China" ]] || [[ "${REGION}" = "CN" ]]; then
-        CASA_DOWNLOAD_DOMAIN="https://casaos.oss-cn-shanghai.aliyuncs.com/"
-    fi
-}
 
 # 1 Check Arch
 Check_Arch() {
@@ -983,7 +973,6 @@ done
 Detach_From_CasaOS_Service
 
 # Step 0 : Get Download Url Domain
-Get_Download_Url_Domain
 # Step 1: Check ARCH
 Check_Arch
 
