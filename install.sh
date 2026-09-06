@@ -83,14 +83,18 @@ readonly CASA_UNINSTALL_URL="${CASAOS_RELEASE_BASE_URL}/casaos-uninstall"
 # Component releases this installer was cut against. Every double-underscore
 # marker below is
 # written by scripts/build-release-bundle.sh from release/components.env and
-# from the checksums.txt each component publishes; nothing here is typed by
-# hand. The script as committed will refuse to run until it has been filled.
+# from the checksums.txt each component publishes, or, for the dashboard and
+# the App Store, whose releases publish none, from the package itself; nothing
+# here is typed by hand. The script as committed will refuse to run until it
+# has been filled.
 readonly CASAOS_TAG="__CASAOS_TAG__"
 readonly CASAOS_GATEWAY_TAG="__CASAOS_GATEWAY_TAG__"
 readonly CASAOS_USER_SERVICE_TAG="__CASAOS_USER_SERVICE_TAG__"
 readonly CASAOS_MESSAGE_BUS_TAG="__CASAOS_MESSAGE_BUS_TAG__"
 readonly CASAOS_LOCAL_STORAGE_TAG="__CASAOS_LOCAL_STORAGE_TAG__"
 readonly CASAOS_UI_TAG="__CASAOS_UI_TAG__"
+readonly CASAOS_CLI_TAG="__CASAOS_CLI_TAG__"
+readonly CASAOS_APPSTORE_TAG="__CASAOS_APPSTORE_TAG__"
 readonly CASAOS_UPDATE_LOG="/var/log/casaos/upgrade.log"
 readonly CASAOS_COMPAT_OVERLAY_FILE="linux-zz-casaos-compat-overlay-${CASAOS_INSTALL_RELEASE_TAG}.tar.gz"
 readonly CASAOS_CORE_PACKAGE_FILE_PREFIX="casaos-${CASAOS_TAG}"
@@ -100,6 +104,23 @@ readonly CASAOS_APP_MANAGEMENT_SHA256_ARM7="__CASAOS_APP_MANAGEMENT_SHA256_ARM7_
 readonly CASAOS_CORE_SHA256_AMD64="__CASAOS_CORE_SHA256_AMD64__"
 readonly CASAOS_CORE_SHA256_ARM64="__CASAOS_CORE_SHA256_ARM64__"
 readonly CASAOS_CORE_SHA256_ARM7="__CASAOS_CORE_SHA256_ARM7__"
+readonly CASAOS_GATEWAY_SHA256_AMD64="__CASAOS_GATEWAY_SHA256_AMD64__"
+readonly CASAOS_GATEWAY_SHA256_ARM64="__CASAOS_GATEWAY_SHA256_ARM64__"
+readonly CASAOS_GATEWAY_SHA256_ARM7="__CASAOS_GATEWAY_SHA256_ARM7__"
+readonly CASAOS_MESSAGE_BUS_SHA256_AMD64="__CASAOS_MESSAGE_BUS_SHA256_AMD64__"
+readonly CASAOS_MESSAGE_BUS_SHA256_ARM64="__CASAOS_MESSAGE_BUS_SHA256_ARM64__"
+readonly CASAOS_MESSAGE_BUS_SHA256_ARM7="__CASAOS_MESSAGE_BUS_SHA256_ARM7__"
+readonly CASAOS_USER_SERVICE_SHA256_AMD64="__CASAOS_USER_SERVICE_SHA256_AMD64__"
+readonly CASAOS_USER_SERVICE_SHA256_ARM64="__CASAOS_USER_SERVICE_SHA256_ARM64__"
+readonly CASAOS_USER_SERVICE_SHA256_ARM7="__CASAOS_USER_SERVICE_SHA256_ARM7__"
+readonly CASAOS_LOCAL_STORAGE_SHA256_AMD64="__CASAOS_LOCAL_STORAGE_SHA256_AMD64__"
+readonly CASAOS_LOCAL_STORAGE_SHA256_ARM64="__CASAOS_LOCAL_STORAGE_SHA256_ARM64__"
+readonly CASAOS_LOCAL_STORAGE_SHA256_ARM7="__CASAOS_LOCAL_STORAGE_SHA256_ARM7__"
+readonly CASAOS_CLI_SHA256_AMD64="__CASAOS_CLI_SHA256_AMD64__"
+readonly CASAOS_CLI_SHA256_ARM64="__CASAOS_CLI_SHA256_ARM64__"
+readonly CASAOS_CLI_SHA256_ARM7="__CASAOS_CLI_SHA256_ARM7__"
+readonly CASAOS_UI_SHA256="__CASAOS_UI_SHA256__"
+readonly CASAOS_APPSTORE_SHA256="__CASAOS_APPSTORE_SHA256__"
 readonly CASAOS_COMPAT_OVERLAY_SHA256="__CASAOS_COMPAT_OVERLAY_SHA256__"
 
 # REQUIREMENTS CONF PATH
@@ -303,16 +324,31 @@ Check_Arch() {
         TARGET_ARCH="arm64"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_ARM64}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_ARM64}"
+        CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_ARM64}"
+        CASAOS_MESSAGE_BUS_SHA256="${CASAOS_MESSAGE_BUS_SHA256_ARM64}"
+        CASAOS_USER_SERVICE_SHA256="${CASAOS_USER_SERVICE_SHA256_ARM64}"
+        CASAOS_LOCAL_STORAGE_SHA256="${CASAOS_LOCAL_STORAGE_SHA256_ARM64}"
+        CASAOS_CLI_SHA256="${CASAOS_CLI_SHA256_ARM64}"
         ;;
     *64*)
         TARGET_ARCH="amd64"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_AMD64}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_AMD64}"
+        CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_AMD64}"
+        CASAOS_MESSAGE_BUS_SHA256="${CASAOS_MESSAGE_BUS_SHA256_AMD64}"
+        CASAOS_USER_SERVICE_SHA256="${CASAOS_USER_SERVICE_SHA256_AMD64}"
+        CASAOS_LOCAL_STORAGE_SHA256="${CASAOS_LOCAL_STORAGE_SHA256_AMD64}"
+        CASAOS_CLI_SHA256="${CASAOS_CLI_SHA256_AMD64}"
         ;;
     *armv7*)
         TARGET_ARCH="arm-7"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_ARM7}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_ARM7}"
+        CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_ARM7}"
+        CASAOS_MESSAGE_BUS_SHA256="${CASAOS_MESSAGE_BUS_SHA256_ARM7}"
+        CASAOS_USER_SERVICE_SHA256="${CASAOS_USER_SERVICE_SHA256_ARM7}"
+        CASAOS_LOCAL_STORAGE_SHA256="${CASAOS_LOCAL_STORAGE_SHA256_ARM7}"
+        CASAOS_CLI_SHA256="${CASAOS_CLI_SHA256_ARM7}"
         ;;
     *)
         Show 1 "Aborted, unsupported or unknown architecture: $UNAME_M"
@@ -327,9 +363,9 @@ Check_Arch() {
 "https://github.com/inkly/CasaOS-LocalStorage/releases/download/${CASAOS_LOCAL_STORAGE_TAG}/linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz"
 "https://github.com/inkly/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_VERSION}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz"
 "https://github.com/inkly/CasaOS/releases/download/${CASAOS_TAG}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-CLI/releases/download/v0.4.4-3-alpha1/linux-${TARGET_ARCH}-casaos-cli-v0.4.4-3-alpha1.tar.gz"
+"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-CLI/releases/download/${CASAOS_CLI_TAG}/linux-${TARGET_ARCH}-casaos-cli-${CASAOS_CLI_TAG}.tar.gz"
 "https://github.com/inkly/CasaOS-UI/releases/download/${CASAOS_UI_TAG}/linux-all-casaos-${CASAOS_UI_TAG}.tar.gz"
-"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-AppStore/releases/download/v0.4.5/linux-all-appstore-v0.4.5.tar.gz"
+"${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-AppStore/releases/download/${CASAOS_APPSTORE_TAG}/linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz"
 "${CASAOS_RELEASE_BASE_URL}/${CASAOS_COMPAT_OVERLAY_FILE}"
     )
 }
@@ -722,7 +758,7 @@ Configuration_Addons() {
     fi
 }
 
-# Verify a fork-owned package before extracting it.
+# Verify a downloaded package before extracting it.
 Verify_Fork_Package() {
     local package_file="$1"
     local expected_sha256="$2"
@@ -753,11 +789,32 @@ DownloadAndInstallCasaOS() {
         done
 
         Verify_Fork_Package \
+            "linux-${TARGET_ARCH}-casaos-gateway-${CASAOS_GATEWAY_TAG}.tar.gz" \
+            "${CASAOS_GATEWAY_SHA256}"
+        Verify_Fork_Package \
+            "linux-${TARGET_ARCH}-casaos-message-bus-${CASAOS_MESSAGE_BUS_TAG}.tar.gz" \
+            "${CASAOS_MESSAGE_BUS_SHA256}"
+        Verify_Fork_Package \
+            "linux-${TARGET_ARCH}-casaos-user-service-${CASAOS_USER_SERVICE_TAG}.tar.gz" \
+            "${CASAOS_USER_SERVICE_SHA256}"
+        Verify_Fork_Package \
+            "linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz" \
+            "${CASAOS_LOCAL_STORAGE_SHA256}"
+        Verify_Fork_Package \
             "linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz" \
             "${CASAOS_APP_MANAGEMENT_SHA256}"
         Verify_Fork_Package \
             "linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz" \
             "${CASAOS_CORE_SHA256}"
+        Verify_Fork_Package \
+            "linux-${TARGET_ARCH}-casaos-cli-${CASAOS_CLI_TAG}.tar.gz" \
+            "${CASAOS_CLI_SHA256}"
+        Verify_Fork_Package \
+            "linux-all-casaos-${CASAOS_UI_TAG}.tar.gz" \
+            "${CASAOS_UI_SHA256}"
+        Verify_Fork_Package \
+            "linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz" \
+            "${CASAOS_APPSTORE_SHA256}"
         Verify_Fork_Package \
             "${CASAOS_COMPAT_OVERLAY_FILE}" \
             "${CASAOS_COMPAT_OVERLAY_SHA256}"
