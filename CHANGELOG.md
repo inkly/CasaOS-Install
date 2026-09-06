@@ -2,6 +2,26 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.48] - 2026-09-06
+
+Components: CasaOS `v0.4.43`, CasaOS-UI `v0.4.38`, AppManagement `v0.4.22`, UserService `v0.4.19`; Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.
+
+### Added
+
+- Two-factor authentication on the account: a TOTP authenticator enrolled with the password and a code, eight single-use recovery codes, a code step on the login page fed by a five-minute pre-auth token, and a "Two-factor authentication" row in the account panel to turn it on or off. Code and password checks are limited to five a minute per user, a code is accepted once, and every write the routes make to the 2FA columns is a compare-and-set on the row as read. `casaos-user-service -ru -user <name>` resets the password and clears 2FA.
+- A `.env` per installed app, edited from a new Environment tab through `GET`/`PUT /v2/app_management/compose/{id}/env`; `${KEY}` references to it, and to `AppID`, `TZ`, `PUID` and `PGID`, survive every settings save and App Store update instead of being baked into `docker-compose.yml`. A `.env` that defines a key the runtime sets itself is refused with a `400` naming the key; a compose whose typed field (`cpus`, `mem_limit`, `privileged`) holds a reference fails to load for editing with a `500` naming the field; a failed load or pull after a `.env` change restores the previous `.env` and `docker-compose.yml`.
+
+### Changed
+
+- ESLint is a CI gate for the dashboard: `pnpm lint` runs `eslint .`, the flat config follows the tree's conventions, one layout pass reformatted 204 files, and a production build with named ids and mangling disabled is byte-identical before and after for 369 of 370 emitted files; the ci workflow runs the lint before the tests and the build. 0 errors, 472 warnings.
+- The core no longer carries the `httper.OasisGet` helper, which fetched a bearer token from IceWhale's `api.casaos.io`, nor the `ServerApi` and `Handshake` lines of the sample configuration; a `casaos.conf` that still has them keeps working.
+
+### Fixed
+
+- Four follow-ups to the v0.4.47 dark theme and Vue 3 move: the network graph was empty; the app card menu and the file browser's menus had lost their styling; the Appearance list in the settings panel was unreadable in the dark theme; after an update the browser kept the previous UI until a manual reload, so the update dialog now reloads the page once it has signed out.
+- A login attempted while the server could not be reached showed no message; it now falls back to the request error's own message.
+- Two lock copies go vet reported in the core's notification service.
+
 ## [0.4.47] - 2026-09-06
 
 Components: CasaOS-UI `v0.4.37`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.

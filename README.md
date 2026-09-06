@@ -16,6 +16,22 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.48
+
+**Two-factor authentication on the account, a `.env` per installed app, and a lint gate on the dashboard.**
+
+The account panel has a new "Two-factor authentication" row, On or Off, that opens the enrolment: the password, then the QR code and the key as text with a Copy button, then the code from the authenticator app to enable it, then eight single-use recovery codes, shown once with a Copy button. From then on a login answers with a five-minute pre-auth token and the login page swaps the password form for a code step: the 6-digit code from the app, or a recovery code through the link under the field, with a Back link to the password step. The pre-auth token is held in the page's component only; nothing is written to local storage until the code is verified, and the session is then stored by the same path a password login uses. Code and password checks are limited to five a minute per user, right or wrong; a code is accepted once; and every write the routes make to the 2FA columns is a compare-and-set on the row as read, so concurrent requests cannot enable, disable or replay twice. Turning it off asks for the password or a code from the app, one or the other. If the authenticator and the recovery codes are both lost, `casaos-user-service -ru -user <name>` resets the password and clears 2FA. The QR code is drawn in the browser by `qrcode` 1.5.4, loaded only by the enrolment screen. The strings are in English and French.
+
+An installed app may now keep its secrets in a `.env` next to its `docker-compose.yml`. An Environment tab in the app's settings, beside Settings and Compose, edits it through `GET`/`PUT /v2/app_management/compose/{id}/env`: `PUT` replaces the whole file, an empty file deletes it, and applying re-creates the app so the new values apply. A reference to one of its keys — `${KEY}`, `$KEY`, `${KEY:-default}` — or to a key the runtime defines (`$AppID`, `${TZ}`, `$PUID`, `${PGID}`) now survives every settings round trip and the App Store update as written, where before the first save or update baked the resolved value into the compose file and every later `.env` edit was a no-op. Before Apply, the editor checks that every line is blank, a `#` comment or a key line as compose-go's dotenv parser takes one, and asks the server for a dry run before the real apply; a `.env` that defines a key the runtime sets itself (`TZ`, `PUID`, `PGID`, `AppID`) is refused with the key named. When the compose file does not load or the pull fails after a `.env` change, the previous `.env` is put back together with the previous `docker-compose.yml`.
+
+ESLint is a CI gate for the dashboard. `pnpm lint` runs `eslint .`, and the ci workflow runs the lint before the tests and the build, so a pull request with a lint error fails. The lint had been red across the tree since the Vue 3 migration — 39 564 errors — because @antfu/eslint-config's defaults, 2-space and script-first, met a tab-indented, template-first tree. The config now follows what the tree does, each option chosen by counting its violations and keeping the one with fewer; one `eslint --fix --fix-type layout` pass then reformatted 204 files, and the production build before and after — with named ids and mangling disabled so that only the source-dependent hashes had to be normalised — is byte-identical for 369 of the 370 emitted files; the 370th is the static `public/js/custom.js`, which gained a final newline. What is left for a human stays visible as warnings, not turned off: 0 errors, 472 warnings at the gate. Also fixed: a login attempted while the server could not be reached showed no message; it now falls back to the request error's own message.
+
+Four follow-ups to the v0.4.47 dark theme and Vue 3 move, found on a real box: the network graph was empty (apexcharts 4 rejects a chart created before its first sample); the app card menu and the file browser's menus had lost their styling (Buefy 3.1 no longer copies a dropdown's class onto the menu it moves under `<body>`); the Appearance list in the settings panel was unreadable in the dark theme; and after an update the browser kept running the previous UI until a manual reload — the update dialog now reloads the page once it has signed out.
+
+In the core, the unused `httper.OasisGet` helper, which fetched a bearer token from IceWhale's `api.casaos.io` for its own requests, is removed with the `ServerApi` and `Handshake` lines of the sample configuration; a `casaos.conf` that still has them keeps working.
+
+The new features did not run on a live CasaOS. They were verified with unit tests, httptest and a served bundle with API stubs; if something on your box behaves differently from v0.4.47, say so in an issue and downgrade with the previous installer while it is looked at.
+
 ## What is in v0.4.47
 
 **A dark theme, and the dashboard on Vue 3.**
@@ -120,11 +136,11 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.42 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.37 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.21 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.38 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.22 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
-| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.18 |
+| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
 | [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.29 |
 
