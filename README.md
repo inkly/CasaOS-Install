@@ -16,6 +16,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.52
+
+**A disk without SMART data is no longer shown as damaged, a machine without sensors shows no CPU wattage, and the uninstall script is digest-checked.**
+
+On a virtual machine — a QEMU disk under Proxmox, for instance — the storage widget showed a red "Damaged" tag while the storage manager's Disk tab called the same disk healthy. LocalStorage read smartctl's `smart_status.passed` as a plain yes/no, so a disk that has no SMART at all was counted as failed on one path and forced healthy on another. It now reports a three-state `smart_status` — passed, failed, unavailable — computed by one helper for every path: the system-status feed, `/v1/disks` and the storage list. A disk is failed only when SMART says so (or smartctl reports DISK FAILING); a disk smartctl cannot query, one in standby, or one with no SMART is unavailable. The dashboard shows "Healthy", "Damage" or "No SMART data" in the widget and "Healthy", "Damage" or "N/A" in the Disk tab, and keeps working against an older LocalStorage. On the same machine the system-status dial printed "0.0W / 0°C"; it prints nothing when neither a power counter nor a temperature sensor answers.
+
+`install.sh` copied the uninstall script it downloads from the release to `/usr/bin/casaos-uninstall` without a check, although `checksums.txt` carried its digest; it is now verified like the ten packages, against a digest written into `install.sh` at release time. LocalStorage v0.4.30 and CasaOS-UI v0.4.41 move; every other component is where v0.4.51 left it.
+
 ## What is in v0.4.51
 
 **Every package the installer downloads is digest-checked, and a failed app start after a `.env` change rolls back.**
@@ -159,12 +167,12 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.43 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.40 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.41 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.24 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.20 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.19 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
-| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.29 |
+| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.30 |
 
 CasaOS-CLI and the App Store are still taken from IceWhaleTech, who continue to maintain them. The exact commits behind a release are in its `components.lock` asset.
 

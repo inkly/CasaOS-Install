@@ -2,10 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
-## [Unreleased]
+## [0.4.52] - 2026-09-06
+
+Components: LocalStorage `v0.4.30`, CasaOS-UI `v0.4.41`; CasaOS `v0.4.43`, AppManagement `v0.4.24`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19` unchanged.
 
 ### Fixed
 
+- A disk without SMART data (a QEMU/Proxmox virtual disk, a device in standby or one smartctl cannot open) was shown as damaged in the storage widget while the Disk tab called it healthy. LocalStorage now sends a three-state `smart_status` (passed, failed, unavailable) from one helper on every path, and the dashboard shows "No SMART data" / "N/A" for it.
+- The system-status dial printed "0.0W / 0°C" on a machine without power and temperature sensors; it prints nothing when neither answers.
 - `install.sh` copied the uninstall script it downloads from the release to `/usr/bin/casaos-uninstall` without checking it, although the release's `checksums.txt` carried its digest and every package was verified. The download is now checked against a digest written into `install.sh` at release time from the shipped `casaos-uninstall`; a mismatch stops the install before anything is copied.
 
 ## [0.4.51] - 2026-09-06
