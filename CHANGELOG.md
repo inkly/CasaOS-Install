@@ -4,12 +4,18 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- Building the release bundle locally aborted with `Not a gzip tarball` on a perfectly good archive whenever the output directory was a Windows drive-letter path. The App Store seed is checked where it is kept rather than in the staging directory, and GNU tar reads a path containing a colon as a remote `host:path`. The archive is handed to tar on standard input now, so tar never parses the path at all. The release runner is Linux and was never affected; the local rebuild that verifies a bundle before every release was.
+- The compatibility overlay had a different digest depending on which tar packed it, for the same tree: 259 bytes, all of them the `devmajor` and `devminor` header fields that tar 1.34 writes as octal zeros and tar 1.35 leaves null in `ustar` format. It is packed as `gnu` now, where both versions leave them null, so the release runner and a machine rebuilding the release to check it produce the same archive.
+
 ### Changed
 
 - The App Store seed the installer downloads is now an asset of the installer's own release. It is still IceWhale's snapshot, fetched from their release when the bundle is built, republished unchanged and pinned by the digest of the copy we serve. This mirrors a snapshot and changes nothing about who curates the catalogue: AppManagement still polls IceWhale's live store feed, the apps and their icons are still theirs. What it removes is the install-time dependency on IceWhale's release still existing — until now, the day that asset went away every new install failed at `wget`.
 
 ### Removed
 
+- IceWhale's `update.sh` and the stale `casaos-tags`, both at the repository root. `update.sh` installed IceWhale's `v0.4.4` component bundle from their releases; `casaos-tags` pinned component versions frozen since `v0.4.31`. Nothing in this repository reads either and the release workflow publishes neither, so the only channel that ever served them was GitHub Pages under the `CNAME` IceWhale committed in 2021 - a domain this distribution does not own.
 - IceWhale's CasaOS-CLI package. It placed `/usr/bin/casaos-cli` and a bash completion, and nothing in the distribution ever invoked either: no service, setup script, migration script, systemd unit or dashboard call. It was the second of the two IceWhale release assets a new install could not come up without. On a box that already has it, the file stays where it is; it is no longer listed in the install manifest, so `casaos-uninstall` no longer removes it.
 
 ## [0.4.53] - 2026-09-06

@@ -140,7 +140,10 @@ compute_checksum() {
 
     curl -fsSL -o "${file}" "${url}" || fail "Failed to download ${url}."
     [[ -s "${file}" ]] || fail "Empty download: ${url}"
-    tar -tzf "${file}" >/dev/null 2>&1 || fail "Not a gzip tarball: ${url}"
+    # read the archive from stdin: the shell opens the path, so tar never
+    # parses it, and a keep directory that is a Windows drive-letter path is
+    # not taken for a remote host:path.
+    tar -tzf - <"${file}" >/dev/null 2>&1 || fail "Not a gzip tarball: ${url}"
 
     sha256sum "${file}" | awk '{ print $1 }'
 }
@@ -149,14 +152,17 @@ compute_checksum() {
 # The overlay's digest is written into install.sh, so the same tree must give
 # the same bytes wherever it is packaged: entries are sorted by name, owner and
 # group are 0 with no names, and every mtime is a fixed instant in UTC rather
-# than the local clock. GNU tar on the release runner (ubuntu-22.04) produces
-# the same bytes as GNU tar here; gzip -n leaves the name and time out of the
-# header.
+# than the local clock; gzip -n leaves the name and time out of the header.
+# The format is gnu, not ustar, because ustar is not stable across tar
+# releases: for a regular file tar 1.34 writes devmajor and devminor as octal
+# zeros where tar 1.35 leaves them null, which is 259 differing bytes and a
+# different digest for the same tree. Both versions leave them null in gnu
+# format, so the release runner and a local rebuild agree.
 create_archive() {
     local stage_dir="$1"
     local output_file="$2"
 
-    COPYFILE_DISABLE=1 tar --format=ustar --sort=name --owner=0 --group=0 --numeric-owner \
+    COPYFILE_DISABLE=1 tar --format=gnu --sort=name --owner=0 --group=0 --numeric-owner \
         --mtime='2020-01-01 00:00:00 UTC' -C "${stage_dir}" -cf - build | gzip -n >"${output_file}"
 }
 
