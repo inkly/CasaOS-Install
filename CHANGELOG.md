@@ -2,6 +2,12 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [Unreleased]
+
+### Fixed
+
+- `install.sh` copied the uninstall script it downloads from the release to `/usr/bin/casaos-uninstall` without checking it, although the release's `checksums.txt` carried its digest and every other download was verified. The download is now checked against a digest written into `install.sh` at release time from the shipped `casaos-uninstall`; a mismatch stops the install before anything is copied.
+
 ## [0.4.51] - 2026-09-06
 
 Components: AppManagement `v0.4.24`; CasaOS `v0.4.43`, CasaOS-UI `v0.4.40`, UserService `v0.4.19`, Gateway `v0.4.20`, MessageBus `v0.4.19`, LocalStorage `v0.4.29` unchanged.

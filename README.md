@@ -14,7 +14,7 @@ Supported architectures: amd64, arm64 and arm/v7. The installer detects the dist
 
 Running the same command on an existing install upgrades it. Installs made from alvins82's or IceWhale's installers can be migrated the same way; the in-app updater then follows this distribution's releases. Do not use `get.casaos.io/update` afterwards: it installs IceWhale's frozen component bundle.
 
-Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store, whose releases publish no checksums — computed from the package as published; none is typed by hand.
+Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
 ## What is in v0.4.51
 
@@ -174,7 +174,7 @@ Nothing is built on a workstation.
 
 1. Each component is tagged and its own workflow publishes tarballs and, except the dashboard, a `checksums.txt`.
 2. Those tags and commits are pinned in [`release/components.env`](release/components.env).
-3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches the published digest of every package that has one, computes the digest of the dashboard and App Store packages from the packages themselves, writes every tag and digest into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
+3. This repository is tagged. Its workflow checks out the six components at the pinned commits, packages their setup scripts as the compatibility overlay, fetches the published digest of every package that has one, computes the digest of the dashboard and App Store packages from the packages themselves and of the uninstall script it ships, writes every tag and digest into `install.sh`, and publishes the result. It refuses to produce an installer with a placeholder left unfilled.
 
 `scripts/build-release-bundle.sh` is that step. It can be run locally: `WORKSPACE_ROOT` names the directory holding the six component checkouts at the pinned commits, `CHECKSUMS_BASE_URL` is where the six components' `checksums.txt` and the dashboard tarball are downloaded from, and `UPSTREAM_BASE_URL` is where CasaOS-CLI's `checksums.txt` and the App Store tarball are downloaded from. Both default to GitHub; a `file://` URL pointing at a local tree laid out as `<repo>/releases/download/<tag>/` exercises the whole chain before any release exists.
 
