@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.46] - 2026-09-06
+
+Components: CasaOS-UI `v0.4.36`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.
+
+### Changed
+
+- The dashboard is fully translated into French: the seventy-six strings of the system package updates, merged storage, the Compose editor, share accounts and Time Machine shares that were still shown in English.
+
 ## [0.4.45] - 2026-09-05
 
 Components: CasaOS-UI `v0.4.35`; CasaOS `v0.4.42`, Gateway `v0.4.20`, AppManagement `v0.4.21`, MessageBus `v0.4.19`, UserService `v0.4.18`, LocalStorage `v0.4.29` unchanged.

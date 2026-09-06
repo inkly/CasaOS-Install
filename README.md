@@ -16,6 +16,10 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction. The digests are written into `install.sh` at release time from the checksums each component publishes; none is typed by hand.
 
+## What is in v0.4.46
+
+**The dashboard is fully translated into French.** Everything this distribution added since the fork, from the system package updates and merged storage to the Compose editor, the share accounts and the Time Machine shares, was still shown in English on a French dashboard: seventy-six strings, now translated.
+
 ## What is in v0.4.45
 
 **The "App launching" row looks like the rest of the settings panel.** It had no icon, no title line and none of the spacing its neighbours share, so it sat against the panel's edge as a bare label and button. It now has the same structure, and its description line shows the current mode: apps open inside CasaOS, or in a new tab. The settings panel and the App launching dialog are translated into French.
