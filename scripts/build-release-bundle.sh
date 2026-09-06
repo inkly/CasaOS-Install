@@ -16,7 +16,8 @@
 # What it produces, in OUTPUT_DIR:
 #   install.sh            the installer with every tag and digest filled in
 #   casaos-uninstall      the uninstaller, served from our release rather than
-#                         from a third party's web server
+#                         from a third party's web server; its digest is
+#                         written into install.sh like the packages'
 #   linux-zz-casaos-compat-overlay-<tag>.tar.gz
 #                         the setup scripts of the six components, plus the
 #                         release marker read by the in-app updater
@@ -188,6 +189,11 @@ fill_installer() {
     overlay_sum="$(sha256sum "${OUTPUT_DIR}/${OVERLAY_FILE}" | awk '{ print $1 }')"
     sed -i "s|__CASAOS_COMPAT_OVERLAY_SHA256__|${overlay_sum}|g" "${target}"
 
+    # the uninstaller as it will be served, already copied into OUTPUT_DIR
+    local uninstall_sum
+    uninstall_sum="$(sha256sum "${OUTPUT_DIR}/casaos-uninstall" | awk '{ print $1 }')"
+    sed -i "s|__CASAOS_UNINSTALL_SHA256__|${uninstall_sum}|g" "${target}"
+
     # base url, placeholder stem, repository, tag, asset name stem: one line
     # per package released per architecture with a checksums.txt
     local spec base stem repo tag name
@@ -273,8 +279,8 @@ write_checksums() {
 }
 
 package_overlay
-fill_installer "${OUTPUT_DIR}/install.sh"
 install -m 0755 "${INSTALLER_ROOT}/casaos-uninstall" "${OUTPUT_DIR}/casaos-uninstall"
+fill_installer "${OUTPUT_DIR}/install.sh"
 install -m 0644 "${COMPONENT_LOCK}" "${OUTPUT_DIR}/components.lock"
 write_version_manifest
 write_checksums
