@@ -122,6 +122,7 @@ readonly CASAOS_CLI_SHA256_ARM7="__CASAOS_CLI_SHA256_ARM7__"
 readonly CASAOS_UI_SHA256="__CASAOS_UI_SHA256__"
 readonly CASAOS_APPSTORE_SHA256="__CASAOS_APPSTORE_SHA256__"
 readonly CASAOS_COMPAT_OVERLAY_SHA256="__CASAOS_COMPAT_OVERLAY_SHA256__"
+readonly CASAOS_UNINSTALL_SHA256="__CASAOS_UNINSTALL_SHA256__"
 
 # REQUIREMENTS CONF PATH
 # Udevil
@@ -774,6 +775,8 @@ Verify_Fork_Package() {
 
 # Download And Install CasaOS
 DownloadAndInstallCasaOS() {
+    # With -p <build_dir> the packages are neither downloaded nor verified:
+    # this block is skipped and the preset directory is used as is.
     if [ -z "${BUILD_DIR}" ]; then
         ${sudo_cmd} rm -rf ${TMP_ROOT}
         mkdir -p ${TMP_ROOT} || Show 1 "Failed to create temporary directory"
@@ -886,6 +889,7 @@ DownloadAndInstallCasaOS() {
         ${sudo_cmd} rm -rf "$PREFIX/tmp/casaos-uninstall"
     fi
     ${sudo_cmd} curl -fsSL "$CASA_UNINSTALL_URL" >"$PREFIX/tmp/casaos-uninstall"
+    Verify_Fork_Package "$PREFIX/tmp/casaos-uninstall" "${CASAOS_UNINSTALL_SHA256}"
     ${sudo_cmd} cp -rf "$PREFIX/tmp/casaos-uninstall" $CASA_UNINSTALL_PATH || {
         Show 1 "Download uninstall script failed, Please check if your internet connection is working and retry."
         exit 1
