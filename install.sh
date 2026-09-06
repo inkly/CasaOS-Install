@@ -776,7 +776,8 @@ Verify_Fork_Package() {
 # Download And Install CasaOS
 DownloadAndInstallCasaOS() {
     # With -p <build_dir> the packages are neither downloaded nor verified:
-    # this block is skipped and the preset directory is used as is.
+    # this block is skipped and the preset directory is used as is; the
+    # uninstall script below is still downloaded and verified.
     if [ -z "${BUILD_DIR}" ]; then
         ${sudo_cmd} rm -rf ${TMP_ROOT}
         mkdir -p ${TMP_ROOT} || Show 1 "Failed to create temporary directory"

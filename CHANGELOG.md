@@ -6,7 +6,7 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ### Fixed
 
-- `install.sh` copied the uninstall script it downloads from the release to `/usr/bin/casaos-uninstall` without checking it, although the release's `checksums.txt` carried its digest and every other download was verified. The download is now checked against a digest written into `install.sh` at release time from the shipped `casaos-uninstall`; a mismatch stops the install before anything is copied.
+- `install.sh` copied the uninstall script it downloads from the release to `/usr/bin/casaos-uninstall` without checking it, although the release's `checksums.txt` carried its digest and every package was verified. The download is now checked against a digest written into `install.sh` at release time from the shipped `casaos-uninstall`; a mismatch stops the install before anything is copied.
 
 ## [0.4.51] - 2026-09-06
 
