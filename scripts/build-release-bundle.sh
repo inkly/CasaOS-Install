@@ -224,7 +224,7 @@ fill_installer() {
             "${CHECKSUMS_BASE_URL} CASAOS_MESSAGE_BUS_SHA256 CasaOS-MessageBus ${CASAOS_MESSAGE_BUS_TAG} casaos-message-bus" \
             "${CHECKSUMS_BASE_URL} CASAOS_USER_SERVICE_SHA256 CasaOS-UserService ${CASAOS_USER_SERVICE_TAG} casaos-user-service" \
             "${CHECKSUMS_BASE_URL} CASAOS_LOCAL_STORAGE_SHA256 CasaOS-LocalStorage ${CASAOS_LOCAL_STORAGE_TAG} casaos-local-storage" \
-            "${CHECKSUMS_BASE_URL} CASAOS_APP_MANAGEMENT_SHA256 CasaOS-AppManagement ${CASAOS_APP_MANAGEMENT_VERSION} casaos-app-management" \
+            "${CHECKSUMS_BASE_URL} CASAOS_APP_MANAGEMENT_SHA256 CasaOS-AppManagement ${CASAOS_APP_MANAGEMENT_TAG} casaos-app-management" \
             "${CHECKSUMS_BASE_URL} CASAOS_CORE_SHA256 CasaOS ${CASAOS_TAG} casaos"; do
             read -r base stem repo tag name <<<"${spec}"
             sum="$(fetch_checksum "${base}" "${repo}" "${tag}" "linux-${arch}-${name}-${tag}.tar.gz")"

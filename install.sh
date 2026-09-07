@@ -75,7 +75,7 @@ readonly UNAME_U
 
 readonly CASA_CONF_PATH=/etc/casaos/gateway.ini
 readonly CASA_UNINSTALL_PATH=/usr/bin/casaos-uninstall
-readonly CASAOS_APP_MANAGEMENT_VERSION="__CASAOS_APP_MANAGEMENT_VERSION__"
+readonly CASAOS_APP_MANAGEMENT_TAG="__CASAOS_APP_MANAGEMENT_TAG__"
 readonly CASAOS_INSTALL_RELEASE_TAG="__CASAOS_RELEASE_TAG__"
 readonly CASAOS_RELEASE_BASE_URL="https://github.com/inkly/CasaOS-Install/releases/download/${CASAOS_INSTALL_RELEASE_TAG}"
 readonly CASAOS_INSTALLER_SELF_URL="${CASAOS_RELEASE_BASE_URL}/install.sh"
@@ -345,7 +345,7 @@ Check_Arch() {
 "https://github.com/inkly/CasaOS-MessageBus/releases/download/${CASAOS_MESSAGE_BUS_TAG}/linux-${TARGET_ARCH}-casaos-message-bus-${CASAOS_MESSAGE_BUS_TAG}.tar.gz"
 "https://github.com/inkly/CasaOS-UserService/releases/download/${CASAOS_USER_SERVICE_TAG}/linux-${TARGET_ARCH}-casaos-user-service-${CASAOS_USER_SERVICE_TAG}.tar.gz"
 "https://github.com/inkly/CasaOS-LocalStorage/releases/download/${CASAOS_LOCAL_STORAGE_TAG}/linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_VERSION}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz"
+"https://github.com/inkly/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_TAG}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_TAG}.tar.gz"
 "https://github.com/inkly/CasaOS/releases/download/${CASAOS_TAG}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
 "https://github.com/inkly/CasaOS-UI/releases/download/${CASAOS_UI_TAG}/linux-all-casaos-${CASAOS_UI_TAG}.tar.gz"
 "${CASAOS_RELEASE_BASE_URL}/linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz"
@@ -787,7 +787,7 @@ DownloadAndInstallCasaOS() {
             "linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz" \
             "${CASAOS_LOCAL_STORAGE_SHA256}"
         Verify_Fork_Package \
-            "linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_VERSION}.tar.gz" \
+            "linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_TAG}.tar.gz" \
             "${CASAOS_APP_MANAGEMENT_SHA256}"
         Verify_Fork_Package \
             "linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz" \
