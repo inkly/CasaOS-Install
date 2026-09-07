@@ -2,6 +2,23 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.55] - 2026-09-07
+
+Components: CasaOS `v0.4.45`, AppManagement `v0.4.26`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`; CasaOS-UI `v0.4.43` unchanged.
+
+### Changed
+
+- The six components moved their Go module path from `github.com/IceWhaleTech/CasaOS-*` to `github.com/inkly/CasaOS-*`. The path is compiled into the binary, so it is what a log line, a stack trace and `go version -m` report on a running box. Only module paths were rewritten: the App Store catalogue URL, the icon CDN, issue links, upstream credits and the per-file copyright notices are untouched, and so are every filesystem path, systemd unit name, API route and the `x-casaos` compose key.
+- All six now depend on `github.com/inkly/CasaOS-Common v0.4.22`, a fork of upstream `v0.4.21` that changes nothing but its own module path. Before this, each pinned a different IceWhale alpha of it, from `v0.4.4-alpha2` to `v0.4.11-alpha4` — immutable on the module proxy, so nothing was at risk of breaking, but nothing in the JWT helpers the services authenticate each other with could be fixed either.
+- Gateway, UserService and MessageBus consequently declare `go 1.21` instead of `go 1.20`, because the forked library declares 1.21. The release pipelines already took their Go version from each module's own `go.mod` and needed no change.
+- The shared library brings in `orca-zhang/ecache`, whose package initialiser starts a goroutine that sleeps in a loop for the lifetime of the process. It exists on import alone; no component calls the cache it backs.
+- Six coverage jobs read their Go version from `go.mod` instead of repeating it in a literal, and five debug release configs no longer name IceWhaleTech as the owner of the draft they would create.
+
+### Fixed
+
+- The dashboard no longer offers an update that is already installed on a box whose `/var/lib/casaos/fork-release` marker is missing. The version the core falls back to in that case is meant to hold the distribution release, which is what the installer writes to that file and what `version.json` announces; it held the core component's own tag, and the two had drifted from equal to eleven releases apart.
+- AppManagement's pin in `release/components.env` is named `CASAOS_APP_MANAGEMENT_TAG`, like the five others, rather than `_VERSION`. Adding the expected `_TAG` line beside the odd `_VERSION` one would have built a green bundle that published an installer downloading the previous release of AppManagement: the stale variable still fills its placeholder, the new one matches none, and the unfilled-placeholder guard sees nothing wrong.
+
 ## [0.4.54] - 2026-09-07
 
 Components: CasaOS `v0.4.44`, CasaOS-UI `v0.4.43`, AppManagement `v0.4.25`, Gateway `v0.4.21`, UserService `v0.4.20`, LocalStorage `v0.4.31`; MessageBus `v0.4.19` unchanged.

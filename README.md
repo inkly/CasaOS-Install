@@ -16,6 +16,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.55
+
+**Every binary this distribution installs is now built from its own source paths, and the shared library the services authenticate each other with is finally one this distribution can patch.**
+
+The six Go modules were still called `github.com/IceWhaleTech/CasaOS-*`. That name is not cosmetic: it is compiled into the binary, so every log line, every stack trace and every `go version -m` record on a running box named a project that has not shipped since 2024. They are `github.com/inkly/CasaOS-*` now. Nothing else moved with them — the App Store catalogue, the icon CDN, the issue links, the upstream credits and the per-file copyright notices are untouched, and so are `/etc/casaos`, `/var/lib/casaos`, the systemd unit names, the API routes and the `x-casaos` key every installed app carries in its compose file.
+
+CasaOS-Common was the last component nobody here had forked, and it is the one that matters most: it holds the JWT helpers the six services use to authenticate each other. Each component pinned a different IceWhale alpha of it, from `v0.4.4-alpha2` to `v0.4.11-alpha4`. Nothing was broken — those versions are immutable on the Go module proxy and would keep building even if the upstream repository vanished — but a bug in shared authentication code was not something this distribution could fix. It is forked now, at upstream `v0.4.21` and unchanged apart from its own module path, and all six components are unified on it. One visible consequence, in the interest of stating it: that library pulls in a small cache whose package initialiser starts a goroutine that sleeps in a loop for the lifetime of the process, in every daemon, for a cache none of them call.
+
+The in-app updater also stops offering an update that is already installed. The version the dashboard falls back to when `/var/lib/casaos/fork-release` is missing was set to the core component's own tag rather than the distribution's, and the two had drifted eleven releases apart.
+
 ## What is in v0.4.54
 
 **Nothing this distribution installs asks a third party where you are, and the dashboard takes no package from IceWhale.**
@@ -182,13 +192,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.44 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.45 |
 | [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.43 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.25 |
-| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.21 |
-| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.20 |
-| [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.19 |
-| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.31 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.26 |
+| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
+| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
+| [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |
+| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.32 |
 
 The installer downloads every package from an inkly release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 
