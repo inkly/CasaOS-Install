@@ -2,6 +2,17 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.58] - 2026-09-09
+
+Components: CasaOS `v0.4.48`, CasaOS-AppManagement `v0.4.28`; CasaOS-UI `v0.4.44`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32` unchanged.
+
+### Fixed
+
+- The update badge and the update button agree. An app could wear the badge and answer "is up to date" when you pressed the button, at the same moment, because the two were answering different questions: the badge reported what the registries said, and the button reports what an update would actually write, which for an app with a catalogue entry is the catalogue's compose. An image that has moved somewhere the catalogue will not follow is not an update anyone can take, so it is no longer advertised as one. The count reported after a check moves with it.
+- An app whose database container had died showed a green dot. The status of a whole app was the state of its main service's first container and nothing else. Every container of every service counts now, the worst state winning, and a state we do not recognise outranks every state we do.
+- The container terminal no longer opens blank and silent. Opening it upgrades the connection, which hijacks it, and the handler then answered a failed `docker exec` with a response nobody was reading: an image with no shell, a container that is not running, any failure at all showed as an empty black box. The reason is written to the terminal now.
+- A failed container recreate could destroy both the old container and the replacement. When the replacement would not start, the original was restarted and the replacement removed, and then the code carried on into the step that removes the original "if the replacement started successfully". It had not. When the original had been stopped rather than running, nothing was restored at all. No feature reaches this path today, which is why nobody hit it.
+
 ## [0.4.57] - 2026-09-09
 
 Components: CasaOS `v0.4.47`, which carries this distribution's tag in the version the dashboard falls back to and is otherwise identical to v0.4.46. Unchanged from v0.4.56: AppManagement `v0.4.27`, CasaOS-UI `v0.4.44`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.

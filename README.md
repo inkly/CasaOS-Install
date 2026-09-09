@@ -16,6 +16,18 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.58
+
+**The dot on an app card tells the truth, the update badge means what the button will do, and the terminal explains itself instead of coming up blank.**
+
+An app whose database container had died showed a green dot. The status of a whole app was the state of its main service's first container and nothing else, so anything that failed alongside it was invisible. Every container of every service counts now, the worst state winning, and a state we do not recognise outranks every state we do.
+
+An app could wear the update badge and answer "is up to date" when you pressed the button, at the same moment. The two were answering different questions: the badge reported what the registries said, and the button reports what an update would actually write, which for an app with a catalogue entry is the catalogue's compose. An image that has moved somewhere the catalogue will not follow is not an update anyone can take, and is no longer advertised as one.
+
+Opening a container terminal upgrades the connection, which hijacks it, and the code then answered a failed `docker exec` with a reply nobody was reading. An image with no shell, a container that is not running, any failure at all: an empty black box and no explanation. The reason is written to the terminal now.
+
+And one that nothing reaches yet, fixed before anything does: a failed container recreate could destroy both the old container and the replacement. When the replacement would not start, the original was restarted and the replacement removed, and the code then carried on into the step that removes the original "if the replacement started successfully" — which it had not. Where the original had been stopped rather than running, nothing was restored at all.
+
 ## What is in v0.4.57
 
 **An upgrade no longer stops because a repository of your own machine has gone stale.**
@@ -216,9 +228,9 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.47 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
 | [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.44 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.27 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.28 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |
