@@ -16,6 +16,20 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.56
+
+**The update button no longer installs an older version than the one you are running, and you can see which apps have a newer image without opening every app's menu.**
+
+"Check then update" could roll an app back, and two separate faults had to line up. The button never checked: it calls the update endpoint without a `force` parameter, and the handler only ran its up-to-date check when `force` was explicitly false, so an absent one meant "update anyway". And the check would not have stopped it, because it reported an update whenever the App Store's tag *differed* from the installed one, in either direction — a catalogue entry sitting behind the running app read as an available update, and taking it was a downgrade. An absent `force` now means not forced, and the check only says yes when the store's tag is genuinely newer.
+
+Three more ways the version comparison got it wrong, each found by reviewing the fix rather than by trusting it. Build suffixes were compared letter by letter, so `ls99` read as newer than `ls124` — and linuxserver.io, which is most of what a home server runs, crosses that boundary at every hundredth build. An image on a registry with a port had its tag read as `5000/app:2.0`, which nothing can order, so the comparison fell through to "any difference is an update". And an image pinned by digest had no tag at all to compare.
+
+The apps menu gains **Check for image updates**. It asks each installed app's registry what its tag points at now and compares that with the copy on disk, and the apps whose image has moved carry a badge next to their icon afterwards. This sees what the App Store's own list cannot: an app nobody publishes a catalogue entry for, and a tag republished under the same name, which is what `latest` does every time. An image that cannot be checked — never pulled, built locally, registry unreachable — is reported separately with the reason and keeps whatever answer it had, rather than being counted as up to date.
+
+**An app that came from no app store can be updated at all now.** Updating one used to look for a catalogue entry, find none and fail, so the dashboard hid the button; anything imported as a compose file was installed once and then frozen. For those the update is a pull of the tags the app already names, through the same path that puts the compose file and the `.env` back if the app fails to come up.
+
+Two things that only ever hurt: a malformed authentication challenge from a registry could stop the app-management service, and no call to a registry had a deadline, so one that answered and then went quiet held its connection for the life of the process.
+
 ## What is in v0.4.55
 
 **Every binary this distribution installs is now built from its own source paths, and the shared library the services authenticate each other with is finally one this distribution can patch.**
@@ -192,9 +206,9 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.45 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.43 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.26 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.46 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.44 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.27 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |

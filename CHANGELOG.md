@@ -2,6 +2,29 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.56] - 2026-09-09
+
+Components: CasaOS `v0.4.46`, CasaOS-AppManagement `v0.4.27`, CasaOS-UI `v0.4.44`; Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32` unchanged.
+
+### Fixed
+
+- "Check then update" could install an older version than the one running. Two faults had to line up. The button never checked: it calls the update endpoint with no `force` parameter, the contract says `force` defaults to false, and the generated binding leaves it nil when the query string omits it — but the handler only ran its check when `force` was explicitly false, so an absent one meant "update anyway", and an update writes the store's compose over the local one whatever version it holds. And the check would not have stopped it: it reported an update whenever the store's tag *differed* from the installed one, in either direction, so a catalogue behind the running app read as an available update. An absent `force` now means not forced, and the check only says yes when the store's tag is genuinely newer. `--force` still applies the store's compose in either direction, which is the way to downgrade on purpose.
+- Version comparison read `ls99` as newer than `ls124`. Version ordering compares a build suffix letter by letter, and linuxserver.io — most of what a home server runs — tags every image `<upstream>-ls<build>` and crosses that boundary at every hundredth build. Digit runs are compared as numbers now.
+- An image on a registry with a port, like `registry.local:5000/app:2.0`, had its tag read as `5000/app:2.0`. Nothing could order that, so the comparison fell through to "any difference is an update" and the catalogue's older version was installed. The tag is what follows the last colon after the last slash.
+- A malformed authentication challenge from a registry could stop the app service. The header is written by the registry, and a directive with no value — which a proxy in front of one produces — read past the end of the parsed pair. It also truncated any authentication URL carrying a query string.
+- No call to a registry had an overall deadline. The existing timeouts cover connecting and the TLS handshake, not waiting for a reply, so a registry that answered and then went quiet held its connection for the life of the process.
+- An image pinned by digest, and a single-segment repository on a private registry, asked their registry for a URL it could not answer, so neither could ever be checked. A digest is a reference in its own right, and `library/` is Docker Hub's implied namespace and nobody else's.
+- The version the dashboard falls back to when `/var/lib/casaos/fork-release` is missing now carries the distribution tag. That marker holds the distribution release, so the fallback has to move with the distribution rather than with the core component; the core ships with every release for that reason, and the installer stops and reinstalls every service on each run anyway.
+
+### Added
+
+- `POST /image-updates` asks each installed app's registry what its tag points at now and compares that with the digest of the copy on disk, and the dashboard's apps menu gains **Check for image updates** to run it. This sees an app that came from no app store, which the store's upgradable list cannot, and a tag republished under the same name, which is what `latest` does every time. Registries are asked once per distinct image, eight at a time. An image no answer can be obtained for — never pulled, built locally, registry unreachable, credentials this host does not have — is reported with its reason and keeps the answer it had, rather than counted as up to date.
+- Apps with a newer image carry a badge beside their icon on the dashboard, served from the cache that check fills and never computed while the grid loads.
+
+### Changed
+
+- An app that came from no app store can be updated. Updating one used to look for a catalogue entry, find none and fail, so the dashboard hid the button; anything imported as a compose file was installed once and then frozen. For those the update is a pull of the tags the app already names, through the same path that puts the compose file and the `.env` back if the app fails to come up.
+
 ## [0.4.55] - 2026-09-07
 
 Components: CasaOS `v0.4.45`, AppManagement `v0.4.26`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`; CasaOS-UI `v0.4.43` unchanged.
