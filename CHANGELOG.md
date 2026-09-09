@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.57] - 2026-09-09
+
+Components: CasaOS `v0.4.47`, which carries this distribution's tag in the version the dashboard falls back to and is otherwise identical to v0.4.46. Unchanged from v0.4.56: AppManagement `v0.4.27`, CasaOS-UI `v0.4.44`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
+
+### Fixed
+
+- An upgrade no longer stops because a repository of the host's own has gone stale. Refreshing the package lists gave every repository configured on the machine a vote on whether CasaOS may upgrade, and the script runs with errors fatal: a Debian box whose `bullseye-security` Release file had passed its expiry — that mirror stopped updating, nothing to do with this machine — got `apt-get update` exit 100, and the upgrade ended there with `CasaOS upgrade failed` and nothing else attempted. None of those repositories belong to CasaOS. The refresh reports the failure as a notice and the install carries on with the lists the host already has; if a package it actually needs is missing, the next step still says so, naming the package.
+
 ## [0.4.56] - 2026-09-09
 
 Components: CasaOS `v0.4.46`, CasaOS-AppManagement `v0.4.27`, CasaOS-UI `v0.4.44`; Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32` unchanged.

@@ -16,6 +16,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.57
+
+**An upgrade no longer stops because a repository of your own machine has gone stale.**
+
+Before installing anything, the installer refreshes the system's package lists so it can find the handful of tools it needs. That step gave every repository configured on the host a vote on whether CasaOS may upgrade, and any failure ended the run. A Debian machine whose `bullseye-security` mirror stopped publishing — so its index had passed its expiry date — saw the whole upgrade stop with `CasaOS upgrade failed`, on a machine where nothing was wrong with CasaOS and every package it needed was already installed.
+
+None of those repositories belong to this distribution. The refresh is best effort now: a failure is reported as a notice and the install continues with the lists the machine already has. If a package it genuinely needs is missing, the next step still stops and names it, which is a message you can act on.
+
+Everything else is unchanged from v0.4.56.
+
 ## What is in v0.4.56
 
 **The update button no longer installs an older version than the one you are running, and you can see which apps have a newer image without opening every app's menu.**
@@ -206,7 +216,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.46 |
+| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.47 |
 | [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.44 |
 | [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.27 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
