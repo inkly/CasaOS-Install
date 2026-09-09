@@ -477,21 +477,37 @@ Get_Port() {
 
 # Update package
 
+# Refreshing the package lists is best effort.
+#
+# Every repository this host happens to have configured gets a vote here, and this
+# script runs under `set -e`: one of them being unreachable, or serving a Release
+# file whose Valid-Until has passed because the mirror stopped updating, used to end
+# the whole upgrade with `CasaOS upgrade failed` and nothing else touched. None of
+# those repositories belong to CasaOS. The packages needed below are already present
+# on any host that is upgrading rather than installing, and Install_Depends says so
+# plainly, naming the package, if one really is missing.
 Update_Package_Resource() {
     Show 2 "Updating package manager..."
     GreyStart
+    local refreshed=0
     if [ -x "$(command -v apk)" ]; then
-        ${sudo_cmd} apk update
+        ${sudo_cmd} apk update || refreshed=$?
     elif [ -x "$(command -v apt-get)" ]; then
-        ${sudo_cmd} apt-get update -qq
+        ${sudo_cmd} apt-get update -qq || refreshed=$?
     elif [ -x "$(command -v dnf)" ]; then
-        ${sudo_cmd} dnf check-update
+        ${sudo_cmd} dnf check-update || refreshed=$?
     elif [ -x "$(command -v zypper)" ]; then
-        ${sudo_cmd} zypper update
+        ${sudo_cmd} zypper update || refreshed=$?
     elif [ -x "$(command -v yum)" ]; then
-        ${sudo_cmd} yum update
+        ${sudo_cmd} yum update || refreshed=$?
     fi
     ColorReset
+
+    if ((refreshed != 0)); then
+        Show 3 "Could not refresh the package lists (exit ${refreshed}). Continuing with the lists this host already has; a repository of its own being stale is not a reason to stop upgrading CasaOS."
+        return 0
+    fi
+
     Show 0 "Update package manager complete."
 }
 
