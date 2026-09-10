@@ -2,6 +2,18 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.62] - 2026-09-10
+
+Components: CasaOS-AppManagement `v0.4.33`. Unchanged from v0.4.61: CasaOS-UI `v0.4.47`, CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
+
+**Upgrade from v0.4.61 if you run a compose app you wrote by hand.** On those hosts v0.4.61 takes the app service down.
+
+### Fixed
+
+- **The app grid no longer crashes the app service.** Reading whether an app is uncontrolled was one expression whose first type assertion had no comma-ok, so a compose file with no `x-casaos` section — one written by hand rather than installed from the store — made it assert a nil value to a map type, which panics. That line had been unreachable for as long as the grid gave up on those apps before reaching it, and v0.4.61 removed exactly that early return, to stop the grid drawing running apps as stopped. So the fix for a greyed-out card became a crash. The grid asks this about every installed app, so a single hand-assembled stack on the host took `casaos-app-management` down on every request: the dashboard answered 502, systemd restarted the service, and the next request killed it again.
+
+- **The same read, one function over.** The grep that followed the crash found its twin in `StoreInfo`, which is called from everywhere: the guard above it tests whether the `x-casaos` KEY is present, which is not the same as its value being a map — and `x-casaos:` with nothing after it puts a nil under a present key. Latent rather than live only because a file shaped that way is rarer than one with no `x-casaos` at all. There is now one rule for this read, and the grid asks it rather than keeping a copy.
+
 ## [0.4.61] - 2026-09-10
 
 Components: CasaOS-AppManagement `v0.4.31`, CasaOS-UI `v0.4.47`. Unchanged from v0.4.60: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
