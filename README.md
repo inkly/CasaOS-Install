@@ -5,14 +5,14 @@
 >
 > CASAOS is a trademark of Shanghai IceWhale Technology Limited. The name is used here only to identify the upstream project that this software is a distribution of, as permitted for referential use; no rights in the CasaOS name or logo are claimed, and no affiliation is implied.
 >
-> The original project is [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS). Please do not report problems with this distribution to IceWhale — open them at [inkly/CasaOS/issues](https://github.com/inkly/CasaOS/issues).
+> The original project is [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS). Please do not report problems with this distribution to IceWhale — open them at [inkly/CasaOS/issues](https://github.com/ReCasaOS/CasaOS/issues).
 
 This is the installer for the **inkly distribution of CasaOS**: a maintained release of the personal-cloud OS after upstream [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) stopped shipping in 2025. It builds on [alvins82's fork](https://github.com/alvins82/CasaOS-Install), which kept CasaOS installable on Docker 29 and Ubuntu 26, and adds authenticated shares, a Compose editor, TLS, and a release pipeline that runs entirely in CI.
 
 ## Install
 
 ```bash
-curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+curl -fsSL https://github.com/ReCasaOS/CasaOS-Install/releases/latest/download/install.sh | sudo bash
 ```
 
 Supported architectures: amd64, arm64 and arm/v7. The installer detects the distribution and architecture at run time. Ubuntu 26 is supported but not required.
@@ -167,7 +167,7 @@ In AppManagement, a `.env` or compose change whose app then fails to start puts 
 
 **The dashboard points at this distribution, and stops talking to the upstream blog; dashboard only.**
 
-The contact bar at the bottom right keeps two links: the feedback icon opens the issues of [inkly/CasaOS](https://github.com/inkly/CasaOS/issues), the GitHub icon opens that repository. The Discord link, the in-app feedback form — which built a prefilled issue for IceWhale's repository — and the share dialog are gone, and so are the two remaining Discord invitations, in the smart-home block and in the app installer's AutoFill hint, which point at the issues now.
+The contact bar at the bottom right keeps two links: the feedback icon opens the issues of [inkly/CasaOS](https://github.com/ReCasaOS/CasaOS/issues), the GitHub icon opens that repository. The Discord link, the in-app feedback form — which built a prefilled issue for IceWhale's repository — and the share dialog are gone, and so are the two remaining Discord invitations, in the smart-home block and in the app installer's AutoFill hint, which point at the issues now.
 
 The news feed from the upstream blog is removed: the brand bar fetched an RSS feed from blog-casaos.zimaspace.com and scrolled the latest posts, behind a "Show news feed from CasaOS Blog" switch in the settings menu and a consent dialog after the first login. The switch, the dialogs, the setting and the RSS dependency are gone; nothing in the dashboard contacts that blog any more. Every other component is where v0.4.49 left it.
 
@@ -242,7 +242,7 @@ Until now the dashboard's update panel polled the release feed of [alvins82's fo
 An installation made before this release cannot repair itself, because the broken setting is exactly what the updater reads. Run the install command once by hand:
 
 ```bash
-curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+curl -fsSL https://github.com/ReCasaOS/CasaOS-Install/releases/latest/download/install.sh | sudo bash
 ```
 
 After that the updater follows this distribution on its own, and CasaOS carries a test that fails if a shipped file and the built-in addresses ever disagree again.
@@ -297,13 +297,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.48 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.34 |
-| [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
-| [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
-| [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |
-| [CasaOS-LocalStorage](https://github.com/inkly/CasaOS-LocalStorage) | v0.4.32 |
+| [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.48 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.48 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.34 |
+| [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.22 |
+| [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.21 |
+| [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.20 |
+| [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.32 |
 
 The installer downloads every package from an inkly release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 

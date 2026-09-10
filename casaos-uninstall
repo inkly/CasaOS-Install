@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 #           CasaOS Uninstaller Script v0.4.16#
-#   GitHub: https://github.com/inkly/CasaOS-Install
-#   Issues: https://github.com/inkly/CasaOS-Install/issues
+#   GitHub: https://github.com/ReCasaOS/CasaOS-Install
+#   Issues: https://github.com/ReCasaOS/CasaOS-Install/issues
 #   Upstream: https://github.com/IceWhaleTech/CasaOS
 #   Requires: bash, mv, rm, tr, grep, sed
 #

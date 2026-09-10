@@ -1,15 +1,15 @@
 #!/usr/bin/bash
 #
 #       CasaOS Installer v0.4.36
-#   GitHub: https://github.com/inkly/CasaOS-Install
-#   Issues: https://github.com/inkly/CasaOS-Install/issues
+#   GitHub: https://github.com/ReCasaOS/CasaOS-Install
+#   Issues: https://github.com/ReCasaOS/CasaOS-Install/issues
 #   Upstream: https://github.com/IceWhaleTech/CasaOS
 #   Requires: bash, mv, rm, tr, grep, sed, curl/wget, tar, smartmontools, parted, ntfs-3g, net-tools
 #
 #   This script installs CasaOS to your system.
 #   Usage:
 #
-#   	$ curl -fsSL https://github.com/inkly/CasaOS-Install/releases/latest/download/install.sh | sudo bash
+#   	$ curl -fsSL https://github.com/ReCasaOS/CasaOS-Install/releases/latest/download/install.sh | sudo bash
 #
 #   In automated environments, you may want to run as root.
 #   If using curl, we recommend using the -fsSL flags.
@@ -77,7 +77,7 @@ readonly CASA_CONF_PATH=/etc/casaos/gateway.ini
 readonly CASA_UNINSTALL_PATH=/usr/bin/casaos-uninstall
 readonly CASAOS_APP_MANAGEMENT_TAG="__CASAOS_APP_MANAGEMENT_TAG__"
 readonly CASAOS_INSTALL_RELEASE_TAG="__CASAOS_RELEASE_TAG__"
-readonly CASAOS_RELEASE_BASE_URL="https://github.com/inkly/CasaOS-Install/releases/download/${CASAOS_INSTALL_RELEASE_TAG}"
+readonly CASAOS_RELEASE_BASE_URL="https://github.com/ReCasaOS/CasaOS-Install/releases/download/${CASAOS_INSTALL_RELEASE_TAG}"
 readonly CASAOS_INSTALLER_SELF_URL="${CASAOS_RELEASE_BASE_URL}/install.sh"
 readonly CASA_UNINSTALL_URL="${CASAOS_RELEASE_BASE_URL}/casaos-uninstall"
 # Component releases this installer was cut against. Every double-underscore
@@ -341,13 +341,13 @@ Check_Arch() {
     esac
     Show 0 "Your hardware architecture is : $UNAME_M"
     CASA_PACKAGES=(
-        "https://github.com/inkly/CasaOS-Gateway/releases/download/${CASAOS_GATEWAY_TAG}/linux-${TARGET_ARCH}-casaos-gateway-${CASAOS_GATEWAY_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS-MessageBus/releases/download/${CASAOS_MESSAGE_BUS_TAG}/linux-${TARGET_ARCH}-casaos-message-bus-${CASAOS_MESSAGE_BUS_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS-UserService/releases/download/${CASAOS_USER_SERVICE_TAG}/linux-${TARGET_ARCH}-casaos-user-service-${CASAOS_USER_SERVICE_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS-LocalStorage/releases/download/${CASAOS_LOCAL_STORAGE_TAG}/linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_TAG}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_TAG}.tar.gz"
-"https://github.com/inkly/CasaOS/releases/download/${CASAOS_TAG}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
-"https://github.com/inkly/CasaOS-UI/releases/download/${CASAOS_UI_TAG}/linux-all-casaos-${CASAOS_UI_TAG}.tar.gz"
+        "https://github.com/ReCasaOS/CasaOS-Gateway/releases/download/${CASAOS_GATEWAY_TAG}/linux-${TARGET_ARCH}-casaos-gateway-${CASAOS_GATEWAY_TAG}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS-MessageBus/releases/download/${CASAOS_MESSAGE_BUS_TAG}/linux-${TARGET_ARCH}-casaos-message-bus-${CASAOS_MESSAGE_BUS_TAG}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS-UserService/releases/download/${CASAOS_USER_SERVICE_TAG}/linux-${TARGET_ARCH}-casaos-user-service-${CASAOS_USER_SERVICE_TAG}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS-LocalStorage/releases/download/${CASAOS_LOCAL_STORAGE_TAG}/linux-${TARGET_ARCH}-casaos-local-storage-${CASAOS_LOCAL_STORAGE_TAG}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS-AppManagement/releases/download/${CASAOS_APP_MANAGEMENT_TAG}/linux-${TARGET_ARCH}-casaos-app-management-${CASAOS_APP_MANAGEMENT_TAG}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS/releases/download/${CASAOS_TAG}/linux-${TARGET_ARCH}-${CASAOS_CORE_PACKAGE_FILE_PREFIX}.tar.gz"
+"https://github.com/ReCasaOS/CasaOS-UI/releases/download/${CASAOS_UI_TAG}/linux-all-casaos-${CASAOS_UI_TAG}.tar.gz"
 "${CASAOS_RELEASE_BASE_URL}/linux-all-appstore-${CASAOS_APPSTORE_TAG}.tar.gz"
 "${CASAOS_RELEASE_BASE_URL}/${CASAOS_COMPAT_OVERLAY_FILE}"
     )
@@ -947,7 +947,7 @@ Welcome_Banner() {
     echo -e " Open your browser and visit the above address."
     echo -e "${GREEN_LINE}"
     echo -e ""
-    echo -e " ${aCOLOUR[2]}Distribution    : https://github.com/inkly/CasaOS-Install"
+    echo -e " ${aCOLOUR[2]}Distribution    : https://github.com/ReCasaOS/CasaOS-Install"
     echo -e " ${aCOLOUR[2]}Upstream        : https://github.com/IceWhaleTech/CasaOS"
     echo -e " ${aCOLOUR[2]}Special Thanks  : Sabitech  Cp0204"
     echo -e ""
