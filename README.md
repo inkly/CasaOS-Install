@@ -16,6 +16,18 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.61
+
+**The dashboard stops misreporting the apps you assembled yourself, and the progress bar during an installation finally means something.**
+
+An app whose compose file carries no `x-casaos` section was drawn as stopped — greyed icon, dimmed card — while every one of its containers was running. The grid builds its answer starting from `unknown` and fills in the real status at the end, and it gave up in between when it could not read the store info, which such a file has none of. The status was never reached. Store info is presentation, and its absence is not a reason to stop answering what an app is doing.
+
+The bar during an installation sat at zero from the first frame to the last, on exactly the installs that finish fastest. Layers were counted when the daemon announced `Pulling fs layer` and `Pull complete` — but a layer this host already has is announced as `Already exists` instead of that pair, so an image already on disk counted nothing at all, and the fraction was zero divided by zero. What came out of that survived both bounds and arrived as zero. A cached layer is now counted on both sides, because it is a layer of the image and there is nothing left to do about it. The arithmetic across the images of a multi-service stack was wrong in its own right: the first image of two was capped at half and the bar then restarted from zero for the second.
+
+**A check that could not verify an app now tells you which one and why.** "Apps that could not be checked: 3" is something to worry about and nothing to do. The reason has always been there, one per app — an unreachable registry, an image nobody can resolve — and the dashboard was reducing all of it to a count. It names three at a time, so one dead registry behind twenty apps does not fill the screen, and it stays up long enough to read.
+
+And the Storage widget's Free up button now shows that it is working. Reclaiming is synchronous and reports the bytes it actually freed, so until the daemon had finished walking the layers the button looked like it had done nothing at all.
+
 ## What is in v0.4.60
 
 **A compose file you wrote yourself is a first-class app, and an update no longer costs you two logins.**
@@ -261,8 +273,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.46 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.30 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.47 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.31 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |

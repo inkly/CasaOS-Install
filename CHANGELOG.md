@@ -2,6 +2,17 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.61] - 2026-09-10
+
+Components: CasaOS-AppManagement `v0.4.31`, CasaOS-UI `v0.4.47`. Unchanged from v0.4.60: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
+
+### Fixed
+
+- **An app written by hand is no longer shown as stopped while it runs.** The app grid builds its answer starting from `unknown` and fills the status in at the end — but gave up in between when the store info could not be read, which is the case for any compose file with no `x-casaos` section. The status fold was never reached, so the card was greyed out and the icon dimmed on a stack whose containers were all up. Store info is presentation; its absence is not a reason to stop answering what the app is doing.
+- **The installation progress bar moves.** Layers were counted only when the daemon announced `Pulling fs layer` and `Pull complete`. A layer this host already has is announced as `Already exists` instead of that pair, so an image already on disk counted nothing at all: the fraction was zero divided by zero, and what came out of it survived both bounds and reached the dashboard as zero. The bar sat at 0 from the first frame to the last, on exactly the installs that finish fastest. The arithmetic across a stack's images was wrong too — the first image of two was capped at half and the bar then restarted from zero for the second.
+- **A check that could not verify an app now says which app, and why.** "Apps that could not be checked: 3" is something to worry about and nothing to do. The reason was there all along, one per app, and the dashboard was reducing it to a count. Three are named at a time, so one unreachable registry behind twenty apps does not fill the screen.
+- The storage widget's **Free up** button shows that it is working. Reclaiming is synchronous and reports the bytes it actually freed, so until the daemon had finished walking the layers the button looked like it had done nothing.
+
 ## [0.4.60] - 2026-09-10
 
 Components: CasaOS-AppManagement `v0.4.30`, CasaOS-UI `v0.4.46`. Unchanged from v0.4.59: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
