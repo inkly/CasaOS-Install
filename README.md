@@ -21,6 +21,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.63
+
+**The second login after an upgrade, for real this time — and a message that had become unreadable.**
+
+v0.4.61 found why an upgrade cost two logins: the upgrade dialog's log poll outlived the dialog, and finished by clearing the session somebody had signed back into in the meantime. The fix stopped the poll. What it could not do is fix the upgrade that installs it, because the dashboard driving an upgrade is the *old* one — the version being replaced. Anyone upgrading to get rid of the double login paid it one last time, which is a poor answer.
+
+So the reload no longer touches the session at all, and that works whatever version drove the upgrade. Clearing it was never doing the work: an upgrade rotates the token keys, so those tokens stop verifying whether or not they are deleted, and the first request after the reload lands on the login page by itself. What clearing did change is the case nobody meant — firing late, after somebody had signed in again.
+
+The other one is a message this distribution added two releases ago and got wrong. A box with four apps behind a single unreachable registry was told so four times over, each line carrying that app's full image reference including its `@sha256:` pin, sixty-four characters of hex apiece, with the app names buried somewhere in the middle. The reason no longer carries the digest — the tag says which service, and the full reference belongs in the logs where something is actually being debugged — and apps are grouped by cause rather than listed one per line. Four apps behind one dead registry now read as one fact with four names on it.
+
 ## What is in v0.4.62
 
 **A crash fix for v0.4.61. If you run a compose app you wrote by hand, upgrade — on those hosts v0.4.61 takes the app service down.**
@@ -288,8 +298,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.47 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.33 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.48 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.34 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |

@@ -2,6 +2,15 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.63] - 2026-09-10
+
+Components: CasaOS-AppManagement `v0.4.34`, CasaOS-UI `v0.4.48`. Unchanged from v0.4.62: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
+
+### Fixed
+
+- **The second login after an upgrade, for real this time.** v0.4.61 stopped the upgrade dialog's log poll outliving the dialog, which is what deleted the session somebody had just signed back into. But the dashboard that drives an upgrade is the *old* one — the version being replaced — so the upgrade that installed the fix still ran the bug, and cost one last double login. The reload now leaves the session alone entirely, which is safe whatever version drove the upgrade. Clearing it was never load-bearing: an upgrade rotates the token keys, so those tokens are dead whether or not they are deleted, and the first request after the reload lands on the login page anyway. What clearing did change is the case nobody meant — firing late, after somebody had signed in again, and deleting a session that was alive.
+- **The message naming apps a check could not verify is readable.** A box with four apps behind one unreachable registry got four lines, each carrying that app's full image reference including its `@sha256:` pin — sixty-four characters of hex apiece — with the same cause repeated four times, and the app names buried in the middle. The reason no longer carries the digest, and apps are grouped by cause: up to three named, the rest counted. Four apps behind one dead registry now read as one fact with four names on it.
+
 ## [0.4.62] - 2026-09-10
 
 Components: CasaOS-AppManagement `v0.4.33`. Unchanged from v0.4.61: CasaOS-UI `v0.4.47`, CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
