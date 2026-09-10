@@ -16,6 +16,26 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.59
+
+**An app is a stack, not a container. This release is the dashboard finally saying so — and the update it offers you being one you can actually take.**
+
+Most of what people run here is several containers: a VPN with services routed through it, a database with a migration sidecar, a media server with a scanner beside it. The dashboard showed all of that as one row with one dot, and the dot was the state of one container of one service. An app whose database had died looked fine. There is now a **Containers tab** in the app settings panel: a row per container of every service, with its state in words, Docker health, image, published ports, uptime and, once it has stopped, its exit code. Replicas of a scaled service each get their own row instead of the first one standing in for all of them.
+
+**Editing an app's compose file no longer takes your edit away five minutes later.** Compose says an app is up only once every service is running-or-healthy, and a one-shot init container — a `db-migrate`, a `chown` sidecar — can never be: it exits 0 and compose reports `container X exited (0)` within a poll or two. That was read as a failed apply, and the backup went back over the file you had just saved, on a stack that was running the whole time. The daemon is asked what is actually there now, rather than compose's message being read as an API: containers running or exited cleanly is an app that settled, and your file stays. A non-zero exit, a restart loop, or no answer at all is still a failure that rolls back. The same applies to a stack that is simply slow — a VPN handshake and two services chained on `service_healthy` with 60-second start periods — and the five-minute deadline is now a setting, `UpWaitTimeout` under `[app]` in `app-management.conf`.
+
+A bad edit is still a bad edit, and that turns out to be the harder half. Everything compose does before it touches a single container — resolving an image that does not exist, creating a network or a volume, refusing a duplicate `container_name` — fails while the previous definition's containers are still running and perfectly healthy, so asking them whether the app came up would answer about the wrong app entirely. Creating and starting are two separate steps now: a create that fails rolls back like any other failed apply, and only the containers compose actually created ever answer for the definition that made them.
+
+**The update offered to a hand-assembled stack is one the button can take.** The decision used to read the main service's tag alone and then refuse to trust the registries unless every other image matched the catalogue exactly — so a catalogue that bumped only a sidecar was invisible, and any container you had added by hand threw the whole answer away. It is now decided service by service, on the rule that actually holds: no service goes backwards and something really changes. And the check asks your containers what image they were created from rather than asking the local store what a tag points at, because the two diverge the moment anything pulls without a successful recreate.
+
+**The dashboard checks for image updates on its own now**, every six hours and once three minutes after start, and remembers the answers across a restart. Until now the only way to ask was to open one app and press a button. Checking is not applying: nothing here recreates your containers while you are asleep.
+
+**Old app versions can be reclaimed from the Storage widget**, where you are already reading how full the disk is. It stays hidden until there is something to free, names the count and the size before you press anything, and only ever removes images no app runs any more — never the image of a stopped app, which on a home server is a routine state and not garbage.
+
+Also: a **CPU limit** in the compose editor, which CPU Shares could never express; **log lines that carry the time the daemon wrote them**, a 100 / 1000 / whole-log selector and a Download button; **logs and terminal that follow the container row you opened them on** instead of the whole stack; **pull-and-recreate for a container CasaOS did not install**, offered nowhere it would break a project; and the compose editor no longer refuses every stack whose project name is not also one of its service names.
+
+And one that had to be fixed before any of the above could ship: a finished update could take the whole app manager down. Events are published from goroutines that read the property map while the request that started them is still writing to it, and `app:updated` is written at the very end of a recreate. A concurrent map read and write is a Go runtime fatal, not a recoverable error — the process dies and every app on the box stops being managed until it restarts. The window was small and the trigger was the ordinary success path.
+
 ## What is in v0.4.58
 
 **The dot on an app card tells the truth, the update badge means what the button will do, and the terminal explains itself instead of coming up blank.**
@@ -229,8 +249,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.44 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.28 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.45 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.29 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |
