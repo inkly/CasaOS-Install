@@ -2,6 +2,21 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.60] - 2026-09-10
+
+Components: CasaOS-AppManagement `v0.4.30`, CasaOS-UI `v0.4.46`. Unchanged from v0.4.59: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.
+
+Everything here comes from one box, reported in one sitting: a stack somebody wrote by hand is not a second-class app, and an update is not a reason to lose your seat.
+
+### Fixed
+
+- **An update no longer costs two logins.** The update dialog is opened outside the router view, so closing it unmounts the component — and its upgrade-log poll went on running anyway, because unlike the system-package dialog it had no unmount hook. The installer restarts the user service, which generates its signing key in memory at every start, so the browser's tokens stop verifying; that orphaned poll took a 401, the refresh behind it failed, and you were sent to the login page. You signed in, a session was created — and the same poll, now carrying a valid token, finally read `CasaOS upgrade successfully` and cleared the session it never knew about. The dashboard appeared and was taken away about two hundred milliseconds later, and the reload that followed destroyed the page and the poll with it, which is why the second attempt always worked. Landing on the login page after an update is correct: the old tokens really are dead. Landing there twice was not.
+- A failed token refresh no longer leaves the page unable to make another request. It kept the refresh flag raised with its queue full, so every later 401 was parked behind a refresh that would never be attempted again and hung for as long as the page lived — which is why the poll above never reported its own error and never stopped itself.
+- Signing in navigates as soon as the session is stored. It used to fetch the system version first, for a router-guard cache nothing else read: when that call failed the throw skipped the navigation and left you on the login page, signed in and unable to tell. The guard's other half went with it — it deleted the access token on arrival whenever that cache was missing, so the only way to fill it was the login it sent you back to.
+- **The Containers tab works for the stacks it was added for.** A compose file written by hand carries no `x-casaos` section, and the endpoint read the main service out of it — so the tab answered ``extension `x-casaos` not found`` instead of showing the containers, on exactly the multi-service stacks the tab exists for. Which service leads is a question about the compose file and has an answer without the extension: what `x-casaos.main` names, and otherwise the alphabetically first service. `GET /compose/{id}` had the same failure on the same apps.
+- **A hand-written stack can be updated at all.** It has no catalogue entry, and that ended the decision before it reached the registry answer — so the card wore the update badge, drawn from that answer, and the button replied "is up to date" in the same breath. Neither is a failure to answer: both mean the update is a re-pull of the tags the app already names, which is what the update now does. Pressing the button through anyway used to fail with the same missing-extension error.
+- **A hand-written stack opens with the name it already has.** App Name is required and is filled from the `x-casaos` section, so the field was blank on every service tab: the settings could not be saved until a name was invented, and renaming started from an empty box rather than the name on the card. The app grid has always shown the compose project name for these apps; the editor now starts from the same one, and a title the compose already carries is left alone.
+
 ## [0.4.59] - 2026-09-10
 
 Components: CasaOS-AppManagement `v0.4.29`, CasaOS-UI `v0.4.45`. Unchanged from v0.4.58: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`. The core no longer ships with every distribution release: `FORK_RELEASE_VERSION` is the distribution the binary was built for, a floor, and `/var/lib/casaos/fork-release` — which the installer writes on every install and upgrade — is what the dashboard reads.

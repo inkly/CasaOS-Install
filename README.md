@@ -16,6 +16,18 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.60
+
+**A compose file you wrote yourself is a first-class app, and an update no longer costs you two logins.**
+
+Everything in this release came from one box in one sitting, and almost all of it is the same root: an app whose compose file carries no `x-casaos` section — one you assembled by hand rather than installed from the store — was supported halfway. It appeared on the dashboard and its settings opened, and then four separate things failed on the missing section. The Containers tab added last release answered ``extension `x-casaos` not found`` instead of listing containers, on precisely the multi-service stacks it was added for. The update button refused for the same reason, while the card beside it wore an update badge, because the badge is drawn from the registry check and the button had never reached it. And App Name, which is a required field, opened blank on every service tab, so the settings could not be saved at all until a name was invented — which is also why renaming one of these apps meant starting from an empty box.
+
+None of that was ever a real absence. Which service leads is a question about the compose file, and it has an answer without the extension: what `x-casaos.main` names, and otherwise the alphabetically first service. An app with no catalogue entry has no version to compare against, which is not a failure either — the update is a re-pull of the tags it already names. And the app is not nameless: the dashboard has always shown the compose project name on the card, so the editor now opens holding that same name.
+
+**The second login after an update is gone.** The update dialog is opened outside the router view, so closing it unmounts the component — but its upgrade-log poll kept running, because unlike the system-package dialog it had no unmount hook. The installer restarts the user service, which generates its signing key in memory at every start and keeps it nowhere, so every token issued before the restart stops verifying; that orphaned poll took a 401, the refresh behind it failed, and you were sent to the login page. You signed in, a session was created — and the same poll, now carrying a valid token, finally read the installer's success line and cleared the session it never knew about. The dashboard appeared and was taken away about two hundred milliseconds later, and the reload that followed destroyed the page and the poll with it, which is why the second attempt always worked and why it was always exactly twice.
+
+Landing on the login page after an update is correct: the old tokens really are dead, by design. Landing there twice was not.
+
 ## What is in v0.4.59
 
 **An app is a stack, not a container. This release is the dashboard finally saying so — and the update it offers you being one you can actually take.**
@@ -249,8 +261,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/inkly/CasaOS) | v0.4.48 |
-| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.45 |
-| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.29 |
+| [CasaOS-UI](https://github.com/inkly/CasaOS-UI) | v0.4.46 |
+| [CasaOS-AppManagement](https://github.com/inkly/CasaOS-AppManagement) | v0.4.30 |
 | [CasaOS-Gateway](https://github.com/inkly/CasaOS-Gateway) | v0.4.22 |
 | [CasaOS-UserService](https://github.com/inkly/CasaOS-UserService) | v0.4.21 |
 | [CasaOS-MessageBus](https://github.com/inkly/CasaOS-MessageBus) | v0.4.20 |
