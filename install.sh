@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #
-#       CasaOS Installer v0.4.36
+#       ReCasaOS Installer __CASAOS_RELEASE_TAG__
 #   GitHub: https://github.com/ReCasaOS/CasaOS-Install
 #   Issues: https://github.com/ReCasaOS/CasaOS-Install/issues
 #   Upstream: https://github.com/IceWhaleTech/CasaOS
