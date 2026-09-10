@@ -29,7 +29,7 @@ echo '
  | |___| (_| \__ \ (_| | |__| |____) |
   \_____\__,_|___/\__,_|\____/|_____/
 
-   --- Made by IceWhale with YOU ---
+   --- ReCasaOS, built on CasaOS by IceWhale ---
 '
 export PATH=/usr/sbin:$PATH
 export DEBIAN_FRONTEND=noninteractive
