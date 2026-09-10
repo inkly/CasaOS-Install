@@ -2,6 +2,21 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.64] - 2026-09-10
+
+Components: CasaOS `v0.4.49`, CasaOS-AppManagement `v0.4.35`, CasaOS-Gateway `v0.4.23`, CasaOS-UserService `v0.4.22`, CasaOS-LocalStorage `v0.4.33`, CasaOS-MessageBus `v0.4.21`, CasaOS-Common `v0.4.23`. CasaOS-UI `v0.4.48` unchanged.
+
+Every component is republished for one reason: the project moved to the ReCasaOS organisation, and a Go module path is not a URL.
+
+### Changed
+
+- **The module paths say where the code lives.** GitHub redirects a moved repository, but the Go tool does not follow that: it compares the path declared in `go.mod` against the path it was asked for and refuses when they differ. So the paths had to be rewritten in the source and released, because a module path is compiled into the binary — it is what every log line, every stack trace and `go version -m` print on a running box. All seven modules are now `github.com/ReCasaOS/*`.
+- Nothing that belongs to IceWhale moved with them. The App Store catalogue, the app icons, the cloud OAuth redirect and the migration entries are byte for byte what they were; the substitution was anchored on the host name so it could not reach them.
+
+### Known, and not introduced here
+
+- The cloud-drive connectors (Google Drive, OneDrive, Dropbox) ship without OAuth credentials, so their sign-in cannot complete. `.goreleaser.yaml` carries `-X` flags to inject them, but the release workflow builds with `go build` and its own `-ldflags` and does not run GoReleaser, so those flags have never been applied and `client_id` is its default, `"private build"`. This predates this release; it was found while checking the module rename, because renaming the path those flags address would have made them silently wrong — and it turned out they were already inert.
+
 ## [0.4.63] - 2026-09-10
 
 Components: CasaOS-AppManagement `v0.4.34`, CasaOS-UI `v0.4.48`. Unchanged from v0.4.62: CasaOS `v0.4.48`, Gateway `v0.4.22`, UserService `v0.4.21`, MessageBus `v0.4.20`, LocalStorage `v0.4.32`.

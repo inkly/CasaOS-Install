@@ -21,6 +21,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.64
+
+**The project moved to its own organisation, and the code now says so.**
+
+Everything lives at [github.com/ReCasaOS](https://github.com/ReCasaOS) rather than in a personal account. GitHub redirects the old addresses, so an installed box keeps working and the install command below is the only one that has ever needed to be right — but a Go module path is not a URL, and it does not follow a redirect. The tool compares the path declared in `go.mod` against the path it was asked for and refuses when they differ. That path is compiled into the binary: it is what every log line, every stack trace and `go version -m` print on a running box. So it had to be rewritten in the source and released, which is what this is. All seven modules are now `github.com/ReCasaOS/*`.
+
+Nothing that belongs to IceWhale moved with them. The App Store catalogue, the app icons, the cloud OAuth redirect and the migration entries are byte for byte what they were: the substitution was anchored on the host name, so it could not reach them. The last time these modules were renamed a looser one silently rewrote 37 store URLs and still built.
+
+One thing was found while checking this rename, and it is older than the rename. GoReleaser is configured to inject the cloud-drive OAuth credentials with `-X github.com/…/CasaOS/drivers/…`, flags that address a package variable by import path — renaming the path without moving them would have turned them into silent no-ops. It turned out they were already inert: the release workflow builds with `go build` and its own `-ldflags`, and has not run GoReleaser for some time. So Google Drive, OneDrive and Dropbox ship with `client_id` at its default, `"private build"`, and their sign-in cannot complete. That is not new here and is not fixed here — it needs OAuth applications registered in this project's own name — but it is written down now rather than left to be discovered.
+
 ## What is in v0.4.63
 
 **The second login after an upgrade, for real this time — and a message that had become unreadable.**
@@ -297,13 +307,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.48 |
+| [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.49 |
 | [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.48 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.34 |
-| [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.22 |
-| [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.21 |
-| [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.20 |
-| [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.32 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.35 |
+| [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.23 |
+| [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.22 |
+| [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.21 |
+| [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.33 |
 
 The installer downloads every package from a ReCasaOS release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 
