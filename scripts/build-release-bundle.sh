@@ -43,7 +43,7 @@
 #                            each at the commit pinned in components.env
 #                            (default: the parent of this repository)
 #   GITHUB_OWNER             account the component releases live under
-#                            (default: inkly)
+#                            (default: ReCasaOS)
 #   CHECKSUMS_BASE_URL       where to fetch <repo>/releases/download/<tag>/checksums.txt
 #                            of the six Go services, and the dashboard tarball,
 #                            from; defaults to GitHub under GITHUB_OWNER. A
@@ -58,7 +58,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly INSTALLER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly WORKSPACE_ROOT="${WORKSPACE_ROOT:-$(cd "${INSTALLER_ROOT}/.." && pwd)}"
 readonly COMPONENT_LOCK="${INSTALLER_ROOT}/release/components.env"
-readonly GITHUB_OWNER="${GITHUB_OWNER:-inkly}"
+readonly GITHUB_OWNER="${GITHUB_OWNER:-ReCasaOS}"
 readonly CHECKSUMS_BASE_URL="${CHECKSUMS_BASE_URL:-https://github.com/${GITHUB_OWNER}}"
 readonly UPSTREAM_BASE_URL="${UPSTREAM_BASE_URL:-https://github.com/IceWhaleTech}"
 
