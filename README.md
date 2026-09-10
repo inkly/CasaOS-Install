@@ -21,6 +21,22 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.65
+
+**A stack you wrote yourself stops looking switched off, and the distribution stops crediting somebody else for itself.**
+
+The dashboard greys an app's card from its status, and the grid was copying that status across only for apps that have store info — which a compose file written by hand does not have. Those apps arrived with no status, and no status is drawn the same as not running: the card went grey while every container in the stack was up, and the app's own Containers tab said so on the same screen. The status never came from the catalogue; it is folded from every container of every service. It only had to survive the trip.
+
+Giving those apps their real status makes something else reachable that was not before. Clicking a card used to fall into the "not running" branch and send `start` to a stack that was already running; now it goes to the branch that opens the app — and an app with no port and no index has nothing to open, so the URL came out as the box's own address: the dashboard, inside the dashboard. Having nothing to open is an answer, and the card gives it.
+
+The rest of this release is the project saying its own name. Five services embed their OpenAPI document verbatim and serve it at `/doc`, so the IceWhale banner each one opened with was plaintext inside the shipped binary and pulled from `IceWhaleTech/logo` by the reader's browser, with an invitation to IceWhale's Discord beside it. The dashboard footer read "Made with ❤️ by IceWhale and YOU!" on every page. The first line of `curl … | sudo bash` said the same. The gateway, the user service and the local storage binaries now contain no IceWhale string at all; the three that do contain the App Store, the icon CDN, and two runtime identifiers that installed boxes match on by name.
+
+What stays IceWhale's stays IceWhale's, and that is most of what matters: the App Store catalogue and its icons, the migration entries, the cloud OAuth redirect, the copyright notices, and the `Upstream:` credit in the installer. The catalogue URL in particular is not ours to change — it is written into `/etc/casaos/app-management.conf` on every installed box, and the on-disk catalogue directory is derived from it.
+
+A test now reads every file the installer ships and fails on any that names IceWhale outside those exceptions. It found one nobody had noticed: `delete-old-service.sh`, shipped into `/usr/share/casaos/shell` on every box for years, calling IceWhale's release API from a script nothing has invoked since CasaOS was a single binary. Six more scripts in the installer repository turned out to be reachable from nothing at all, two of them fetching IceWhale's uninstaller and one a complete second installer piping a third-party script into root. All seven are gone.
+
+One thing the header had been getting wrong for twenty-nine releases: the installer announced itself as `CasaOS Installer v0.4.36`, typed by hand and rewritten by nothing. It is stamped from `components.env` now, and the build fails on any placeholder left unfilled.
+
 ## What is in v0.4.64
 
 **The project moved to its own organisation, and the code now says so.**
@@ -307,13 +323,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 
 | Component | Release |
 |---|---|
-| [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.49 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.48 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.35 |
-| [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.23 |
-| [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.22 |
-| [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.21 |
-| [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.33 |
+| [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.49 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.36 |
+| [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
+| [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
+| [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
+| [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.34 |
 
 The installer downloads every package from a ReCasaOS release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 

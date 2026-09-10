@@ -2,6 +2,41 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.65] - 2026-09-10
+
+Components: CasaOS `v0.4.50`, CasaOS-AppManagement `v0.4.36`, CasaOS-Gateway `v0.4.24`, CasaOS-UserService `v0.4.23`, CasaOS-LocalStorage `v0.4.34`, CasaOS-MessageBus `v0.4.22`, CasaOS-UI `v0.4.49`. CasaOS-Common `v0.4.23` unchanged.
+
+A stack written by hand stops being drawn as if it were switched off, and the distribution stops telling people it was made by somebody else.
+
+### Fixed
+
+- **An app with no `x-casaos` is no longer greyed out while every container in it is running.** The dashboard greys a card from its status, and the grid copied that status into the card only inside the branch that runs when the app has store info — which a compose file written by hand does not have. So those apps arrived with no status at all, and no status reads as not running. The status never came from the catalogue: it is folded from every container of every service, and it only had to survive the trip. This is the last of the family of six defects that all began with an app whose compose file has no `x-casaos`; the others were fixed in v0.4.62 and v0.4.63, and this one was hiding behind them because it lives in the grid rather than in the answer the grid reads.
+- **Clicking such an app no longer opens the dashboard inside the dashboard.** An app says where its web interface is with a published port or an index, and one written by hand says neither — while the grid fills in the box's own address for it before the card is drawn. The URL built from those three came out as `http://<the box>`. That branch was unreachable while the app had no status, because every click fell into the "not running" half and sent `start` to a stack that was already up; giving the app its status makes it reachable. Having nothing to open is now an answer the card gives, rather than a wrong thing it opens.
+- An `x-casaos` with no services under it left the main service name nil, and reading it was a dereference of the same shape as the one that took the whole service down in v0.4.61. It is read through the tolerant path now.
+- A test in the message bus that slept a second and then counted cards, which failed a release workflow this morning when six of them shared a runner. It waits for the count instead.
+
+### Changed
+
+- **What ships stops naming IceWhale where it means this distribution.** Five services embed their OpenAPI document verbatim and serve it at `/doc`, so the IceWhale banner each one opened with was plaintext inside the shipped binary and was fetched from `IceWhaleTech/logo` by the reader's browser, and the invitation to IceWhale's Discord went out with it. The dashboard's footer said "Made with ❤️ by IceWhale and YOU!" on every page, the console banner said it on every load, and the first line printed by `curl … | sudo bash` said it too. All of them name this distribution now and credit the project it is built on. The gateway, the user service and the local storage service contain no IceWhale string at all any more; what remains in the other three is the catalogue, the icon CDN, and two registered runtime identifiers that cannot be renamed without breaking installed boxes.
+- The "what's new" panel after an update linked to IceWhale's repository rather than the one the update came from; the default icon for an external link was IceWhale's GitHub avatar, fetched from GitHub as the link was added; and a disk at 80% offered help as a link to the Chinese half of IceWhale's wiki, whatever language the reader had chosen.
+- The installer's own header said `CasaOS Installer v0.4.36`, and nothing rewrote it — it had been wrong for twenty-nine releases, including the one published this morning. It is filled from `components.env` now by the same pass that fills the digests, and the build already fails on any placeholder left unsubstituted.
+
+### Removed
+
+- `delete-old-service.sh`, which shipped into `/usr/share/casaos/shell` on every box and queried IceWhale's release API, from a script nothing has invoked since CasaOS was a single binary.
+- Six scripts in the installer repository that were reachable from nothing: no reference in any tracked file, and published as no release asset. Two of them would have fetched IceWhale's uninstaller from `raw.githubusercontent.com`; one was a complete second installer that pipes a third-party script into root. The uninstaller this distribution actually ships is `casaos-uninstall`, which the installer downloads, verifies against a digest and installs to `/usr/bin`.
+
+### Added
+
+- A test in CasaOS that reads every file the installer ships and fails on any that names IceWhale, with the catalogue, the icon CDN, the cloud OAuth host and the migration lists excused by name. The guard it joins checked four files it was handed; this one asks the opposite question, so a file nobody thought to add has to be excused on purpose rather than merely overlooked. Run against the previous commit it names `delete-old-service.sh`.
+
+### Kept as IceWhale's, deliberately
+
+- The App Store catalogue and everything served from it: the `main.zip` archive, the per-app icons on `cdn.jsdelivr.net`, `icon.casaos.io`, and the curated list of third-party stores. The store URL in particular is written into `/etc/casaos/app-management.conf` on every installed box and the on-disk catalogue directory is derived from it — changing it would orphan the downloaded catalogue and degrade the box to the bundled snapshot until a fresh download succeeded.
+- The migration entries, whose release assets exist nowhere else, and the keys that detect an old store URL in order to replace it.
+- `cloudoauth.files.casaos.app`, which is the redirect URI registered against IceWhale's own OAuth clients.
+- The per-file copyright notices, the `Upstream:` lines in the installer and the uninstaller, and the ZeroTier network name, which deployed boxes match on exactly.
+
 ## [0.4.64] - 2026-09-10
 
 Components: CasaOS `v0.4.49`, CasaOS-AppManagement `v0.4.35`, CasaOS-Gateway `v0.4.23`, CasaOS-UserService `v0.4.22`, CasaOS-LocalStorage `v0.4.33`, CasaOS-MessageBus `v0.4.21`, CasaOS-Common `v0.4.23`. CasaOS-UI `v0.4.48` unchanged.
