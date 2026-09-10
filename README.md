@@ -5,9 +5,9 @@
 >
 > CASAOS is a trademark of Shanghai IceWhale Technology Limited. The name is used here only to identify the upstream project that this software is a distribution of, as permitted for referential use; no rights in the CasaOS name or logo are claimed, and no affiliation is implied.
 >
-> The original project is [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS). Please do not report problems with this distribution to IceWhale — open them at [inkly/CasaOS/issues](https://github.com/ReCasaOS/CasaOS/issues).
+> The original project is [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS). Please do not report problems with this distribution to IceWhale — open them at [ReCasaOS/CasaOS/issues](https://github.com/ReCasaOS/CasaOS/issues).
 
-This is the installer for the **inkly distribution of CasaOS**: a maintained release of the personal-cloud OS after upstream [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) stopped shipping in 2025. It builds on [alvins82's fork](https://github.com/alvins82/CasaOS-Install), which kept CasaOS installable on Docker 29 and Ubuntu 26, and adds authenticated shares, a Compose editor, TLS, and a release pipeline that runs entirely in CI.
+This is the installer for **ReCasaOS**: a maintained release of the personal-cloud OS after upstream [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) stopped shipping in 2025. It builds on [alvins82's fork](https://github.com/alvins82/CasaOS-Install), which kept CasaOS installable on Docker 29 and Ubuntu 26, and adds authenticated shares, a Compose editor, TLS, and a release pipeline that runs entirely in CI.
 
 ## Install
 
@@ -19,7 +19,7 @@ Supported architectures: amd64, arm64 and arm/v7. The installer detects the dist
 
 Running the same command on an existing install upgrades it. Installs made from alvins82's or IceWhale's installers can be migrated the same way; the in-app updater then follows this distribution's releases. Do not use `get.casaos.io/update` afterwards: it installs IceWhale's frozen component bundle.
 
-Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from an inkly release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
+Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
 ## What is in v0.4.63
 
@@ -159,7 +159,7 @@ On a virtual machine — a QEMU disk under Proxmox, for instance — the storage
 
 **Every package the installer downloads is digest-checked, and a failed app start after a `.env` change rolls back.**
 
-Up to v0.4.50 `install.sh` verified a SHA-256 digest on three of the ten packages it downloaded: the CasaOS core, AppManagement and the compatibility overlay. It now verifies all nine before anything is extracted or any service stopped: the six inkly components against the `checksums.txt` their releases publish, the dashboard and the App Store seed — whose releases publish none — against a digest computed from the package as published at release time. The digests are written into `install.sh` by the release workflow; a package whose digest does not match stops the install with `Checksum verification failed`. The release workflow also fails, instead of writing an empty digest, when a checksum cannot be fetched, and the compatibility overlay is built reproducibly, so its digest no longer depends on the machine that packed it.
+Up to v0.4.50 `install.sh` verified a SHA-256 digest on three of the ten packages it downloaded: the CasaOS core, AppManagement and the compatibility overlay. It now verifies all nine before anything is extracted or any service stopped: the six ReCasaOS components against the `checksums.txt` their releases publish, the dashboard and the App Store seed — whose releases publish none — against a digest computed from the package as published at release time. The digests are written into `install.sh` by the release workflow; a package whose digest does not match stops the install with `Checksum verification failed`. The release workflow also fails, instead of writing an empty digest, when a checksum cannot be fetched, and the compatibility overlay is built reproducibly, so its digest no longer depends on the machine that packed it.
 
 In AppManagement, a `.env` or compose change whose app then fails to start puts the previous `docker-compose.yml` and `.env` back and starts the previous app from them; before, the new files stayed on disk while the previous containers were gone. Every other component is where v0.4.50 left it.
 
@@ -167,7 +167,7 @@ In AppManagement, a `.env` or compose change whose app then fails to start puts 
 
 **The dashboard points at this distribution, and stops talking to the upstream blog; dashboard only.**
 
-The contact bar at the bottom right keeps two links: the feedback icon opens the issues of [inkly/CasaOS](https://github.com/ReCasaOS/CasaOS/issues), the GitHub icon opens that repository. The Discord link, the in-app feedback form — which built a prefilled issue for IceWhale's repository — and the share dialog are gone, and so are the two remaining Discord invitations, in the smart-home block and in the app installer's AutoFill hint, which point at the issues now.
+The contact bar at the bottom right keeps two links: the feedback icon opens the issues of [ReCasaOS/CasaOS](https://github.com/ReCasaOS/CasaOS/issues), the GitHub icon opens that repository. The Discord link, the in-app feedback form — which built a prefilled issue for IceWhale's repository — and the share dialog are gone, and so are the two remaining Discord invitations, in the smart-home block and in the app installer's AutoFill hint, which point at the issues now.
 
 The news feed from the upstream blog is removed: the brand bar fetched an RSS feed from blog-casaos.zimaspace.com and scrolled the latest posts, behind a "Show news feed from CasaOS Blog" switch in the settings menu and a consent dialog after the first login. The switch, the dialogs, the setting and the RSS dependency are gone; nothing in the dashboard contacts that blog any more. Every other component is where v0.4.49 left it.
 
@@ -305,7 +305,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.20 |
 | [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.32 |
 
-The installer downloads every package from an inkly release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
+The installer downloads every package from a ReCasaOS release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 
 ## How a release is made
 
