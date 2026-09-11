@@ -2,6 +2,33 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.66] - 2026-09-11
+
+Components: CasaOS-AppManagement `v0.4.37`, CasaOS-UI `v0.4.50`. Unchanged from v0.4.65: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+Backups, per-container controls, and the last of the defects that all began with an app whose compose file has no `x-casaos`.
+
+### Added
+
+- **Backups.** An app can be copied to an S3 bucket, an SFTP server or an FTP one, on demand or on a schedule, with a retention. None of that transport is new code: this distribution already installs rclone and runs it as a service, so S3, SFTP, FTP, the retries, the resume after a broken connection and the incremental comparison were already on the box. A destination is an rclone remote, which is also where the credentials go — the same config that already holds the ones for cloud drives.
+
+  What is written here is the part rclone cannot know: which paths belong to an app, which of them are its data and which are not, and how to hold the app still while it is copied. `/var/run/docker.sock` is a door rather than data; `/dev`, `/sys` and `/proc` are kernel interfaces with nothing to copy; tmpfs is empty at every start; an anonymous volume has no name to restore it under. Each of those is named in the backup's manifest with its reason, because a backup that quietly drops a mount is discovered on the day it is restored.
+
+  Copying a database while it is writing produces a backup that looks fine and does not restore, so the app is stopped for the length of the copy unless you say otherwise — and whichever was done is recorded, because the only thing worse than an unreliable backup is not knowing which one you have.
+- **Start, stop and restart one container** of an app rather than the whole stack, from the Containers tab, with **CPU and memory** beside them, re-sampled while the tab is open.
+
+### Fixed
+
+- **An app with no `x-casaos` is no longer greyed out while every container in it is running.** The status was worked out correctly and then dropped by the dashboard's own grid, which copied it across only for apps that have a catalogue entry. This is the last of the family of six defects that all began with a compose file written by hand.
+- **Clicking such an app now opens it.** The port is taken from what its containers publish when the compose file names none. The stack that was reported publishes three; the first of them is the BitTorrent port, so "take the first" is not an answer — the container's own port decides, against a short list of ports images serve web interfaces on, and when none matches nothing is offered rather than a wrong link that looks right until it is clicked.
+- **An update stops replacing a floating tag with a fixed one.** An app tracking `develop` had its tag rewritten to whatever version the catalogue named. The decision read the catalogue's tag alone — so a local `develop` survived a catalogue on `latest` and was overwritten by a catalogue on `1.2.3`, which is an accident rather than a rule. Both references decide now. A digest is the opposite case and was got wrong in the first attempt at this: `pull app@sha256:…` returns the same image for ever, so a digest-pinned app can ONLY be updated by rewriting it.
+- **A named volume is a name, not a folder.** `type: volume` rendered as `[object Object]` in the compose editor, and a volume declared with nothing under it lost its name silently. The host picker no longer appears on those rows: it browses the host, so choosing a folder turned the volume into a bind on save.
+- The settings modal has room for its widest tab, and one app Docker cannot answer about no longer empties the whole dashboard.
+
+### Known, and not introduced here
+
+- The cloud-drive connectors still ship without OAuth credentials; that is unchanged since v0.4.64 and needs applications registered in this project's own name.
+
 ## [0.4.65] - 2026-09-10
 
 Components: CasaOS `v0.4.50`, CasaOS-AppManagement `v0.4.36`, CasaOS-Gateway `v0.4.24`, CasaOS-UserService `v0.4.23`, CasaOS-LocalStorage `v0.4.34`, CasaOS-MessageBus `v0.4.22`, CasaOS-UI `v0.4.49`. CasaOS-Common `v0.4.23` unchanged.

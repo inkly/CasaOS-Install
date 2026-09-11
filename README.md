@@ -21,6 +21,20 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.66
+
+**Backups, and the last of the greyed-out apps.**
+
+An app can now be copied to an S3 bucket, an SFTP server or an FTP one, on demand or on a schedule with a retention. Almost none of that is new code. This distribution already installs rclone and runs it as a service, so the transports, the retries, the resume after a broken connection and the incremental comparison were already on every box — a backup destination is an rclone remote, and its credentials go where the cloud drives already keep theirs.
+
+What is written here is what rclone cannot know: which paths belong to an app, which of them are its data, and how to hold it still. A compose file mounts more than data — `/var/run/docker.sock` is a door, `/dev` and `/proc` are kernel interfaces, tmpfs is empty at every start, an anonymous volume has no name to restore it under. Each is named in the manifest with its reason, because a backup that quietly drops a mount is discovered on the day it is restored. Copying a database while it is writing produces a backup that looks fine and does not restore, so the app is stopped for the copy unless you say otherwise, and which of the two was done is written down.
+
+The rest is the last of a family. Six defects on this distribution began with the same thing: an app whose compose file has no `x-casaos`, because somebody wrote it by hand. The card that stayed grey while every container in it was running is the sixth, and it was hiding behind the other five — the status had been fixed, and the dashboard's own grid was dropping it again on the way out. Clicking such an app now opens it too, on a port taken from what its containers publish.
+
+One more of that family, further out: an update was replacing a floating tag with a fixed one, so an app tracking `develop` came back pinned to a version somebody else chose. That decision read the catalogue's tag and never the app's own.
+
+Containers gained controls as well — start, stop and restart one service instead of the whole stack, with CPU and memory beside them.
+
 ## What is in v0.4.65
 
 **A stack you wrote yourself stops looking switched off, and the distribution stops crediting somebody else for itself.**
@@ -324,8 +338,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.49 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.36 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.50 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.37 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
