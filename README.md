@@ -21,6 +21,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.68
+
+**The settings panel is as wide as it was meant to be.**
+
+It was opened with no CSS class at all, so every rule written for it applied to nothing: the width widened one release ago so the Containers tab would fit, and the wrapper cap without which any modal stays at Buefy's default 640px. Ten columns in that space printed one character per line under Image and Memory. The install flow passes the class, which is why that one has always been wide.
+
 ## What is in v0.4.67
 
 **The containers this dashboard did not install stop being one heap with a wrong instruction over it.**
@@ -350,7 +356,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.51 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.52 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |

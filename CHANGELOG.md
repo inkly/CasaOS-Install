@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.68] - 2026-09-11
+
+Components: CasaOS-UI `v0.4.52`. Unchanged from v0.4.67: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+### Fixed
+
+- **An app's settings panel is as wide as it was meant to be.** It was opened with no CSS class at all, so every rule written for that panel applied to nothing — including the width widened in v0.4.66 for the Containers tab, and the wrapper cap without which Buefy holds any modal at its default 640px. Ten columns squeezed into that width printed one character per line under Image and Memory. The install flow passes the class, which is why that one has always been wide; this was the third panel in this distribution to ship at the default width because the class the caller passes and the stylesheet that keys on it live in different files with nothing linking them. That link is now checked at build time.
+
 ## [0.4.67] - 2026-09-11
 
 Components: CasaOS-AppManagement `v0.4.38`, CasaOS-UI `v0.4.51`. Unchanged from v0.4.66: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
