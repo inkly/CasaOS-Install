@@ -2,6 +2,32 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.67] - 2026-09-11
+
+Components: CasaOS-AppManagement `v0.4.38`, CasaOS-UI `v0.4.51`. Unchanged from v0.4.66: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+The containers this dashboard did not install stop being one undifferentiated heap with a wrong instruction over it.
+
+### Added
+
+- **Three headings where there was one.** "Legacy app (To be rebuilt)" covered three populations that have nothing in common but sitting outside the compose list, and for two of them the instruction was wrong. A container Portainer or Dockge started is managed, just not from here — rebuilding it invites a second copy of something already running. One somebody ran by hand is not an app and has nothing to rebuild. The three groups are read from what the backend already sent and nothing was using.
+- **Cards that say what they are.** Docker hands out `adoring_antonelli`, and a container whose name it never set falls back to a 64-character id — for those the name is not an identity and the image is. Image, published port and a rough age now appear on exactly those cards. The age is deliberately rough: nobody deciding whether to delete a stray container needs the minute, and a container created in the future is a clock that disagrees, not an age.
+- **A panel that answers "what is this", and can be rid of it.** Image, state, age, command, restart policy, networks, published ports, host paths, named volumes with their size, and the environment — hidden until asked for, because these routinely carry passwords and a panel somebody opens to identify a container should not put them on screen on the way past.
+
+  Removal shows the volumes **before** anything is deleted, with their size, and shows the ones that cannot go saying why: a container comes back from its image, a volume does not. A volume another container still uses is never offered, and neither is one the daemon cannot count references for — guessing wrong in that direction costs disk space, guessing wrong in the other costs somebody's database. The list is decided again, server-side, against what the daemon says at the moment the button is pressed rather than what the screen was drawn from. A volume the daemon then refuses is reported as kept, because a green tick over a disk that did not shrink is a lie.
+
+  A container belonging to a compose project is refused: taking one service out through this door leaves the project in a state its own manager does not expect. Those cards get the panel and nothing else — the app's own uninstall is how a stack goes.
+
+### Fixed
+
+- **An app stopped by a backup that never finished is started again.** A backup stops the app it is copying and starts it back afterwards, which covers every way a backup can fail except the one where nothing runs at all: a kill, a power cut, a service upgrade mid-copy. The app was left off with nothing looking at it. What is about to be stopped is now written down before the first container goes down and erased after the last one comes back, and a note still there when the service starts is an app to relaunch. Once at startup and never on a timer — a note belonging to a backup running right now would be read as one to undo, and the app would come back up in the middle of its own copy.
+- **Two panels opened at 640px.** The container panel and the backups panel were given a CSS class that has no rule anywhere in the tree, so both fell back to the default width: host paths and environment variables wrapped one word per line, and the schedule row folded into something unreadable.
+
+### Known, and not introduced here
+
+- The backup transport has not been exercised against a running rclone daemon; the first destination check on a real box is what proves it.
+- The cloud-drive connectors still ship without OAuth credentials; unchanged since v0.4.64 and needs applications registered in this project's own name.
+
 ## [0.4.66] - 2026-09-11
 
 Components: CasaOS-AppManagement `v0.4.37`, CasaOS-UI `v0.4.50`. Unchanged from v0.4.65: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.

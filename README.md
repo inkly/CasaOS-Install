@@ -21,6 +21,18 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.67
+
+**The containers this dashboard did not install stop being one heap with a wrong instruction over it.**
+
+"Legacy app (To be rebuilt)" sat over three populations that have nothing in common but being outside the compose list. For two of them it was wrong advice: a container Portainer or Dockge started is managed, just not from here, and rebuilding it invites a second copy of something already running; one somebody ran by hand is not an app and has nothing to rebuild. They are three groups now, read from what the backend already sent and nobody was using.
+
+The cards also say what they are. Docker hands out `adoring_antonelli`, and a container whose name it never set falls back to a 64-character id — for those the name is not an identity and the image is, so image, published port and a rough age appear on exactly those cards and nowhere else.
+
+Clicking one opens a panel that answers the question, and can act on it: command, restart policy, networks, published ports, host paths, named volumes with their size, and the environment behind a Show. Removal shows the volumes before anything is deleted, and the ones that cannot go with the reason — a container comes back from its image, a volume does not. A volume another container still uses is never offered, and the decision is taken again server-side against what the daemon says at the moment the button is pressed, not against what the screen was drawn from.
+
+Also: an app that a backup stopped and never started again — because the process was killed, or the power went — is relaunched when the service comes back up.
+
 ## What is in v0.4.66
 
 **Backups, and the last of the greyed-out apps.**
@@ -338,8 +350,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.50 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.37 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.51 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
