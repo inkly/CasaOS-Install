@@ -21,6 +21,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.72
+
+**rclone is pinned for real, and every release now installs itself and takes a backup before anyone else does.**
+
+The installer used to run rclone.org's install script, which installs whatever is current that day, while checking the installed version against a `v1.61.1` it never installed. Every upgrade therefore removed rclone and downloaded the current one again, announcing a change that did not happen. It is pinned now like the six components — one version in `components.env`, one digest per architecture written into `install.sh` at release time from rclone's own `SHA256SUMS`, verified before it is unpacked — at v1.75.1, which is not a downgrade for any box out there.
+
+And a release is no longer finished when its digests match. A second job installs the bundle just published on a clean Ubuntu VM, exactly as the command at the top of this page says, then registers a user, installs an app from a compose file, creates an rclone destination, takes a backup of the app with it held still, and finds the files and their manifest on disk with the app back up. That is the first time the backup transport has met a running rclone daemon, a gap named in the v0.4.66 notes; it is checked on every release from here on.
+
 ## What is in v0.4.71
 
 **Updating an app drew two progress cards, and the real one never finished.**
@@ -382,12 +390,13 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.55 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.56 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
 | [CasaOS-LocalStorage](https://github.com/ReCasaOS/CasaOS-LocalStorage) | v0.4.34 |
+| [rclone](https://github.com/rclone/rclone) | v1.75.1 |
 
 The installer downloads every package from a ReCasaOS release. The App Store seed — the snapshot a new box needs for its store to be populated before the first refresh — is IceWhale's, mirrored into our release at release time and pinned by the digest of the copy we serve; nothing about the catalogue changes, AppManagement keeps polling IceWhale's live store feed and IceWhale keeps curating it. IceWhale's CasaOS-CLI is no longer installed: nothing in the distribution ever called it. The exact commits behind a release are in its `components.lock` asset.
 

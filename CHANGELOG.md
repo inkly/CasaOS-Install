@@ -2,6 +2,23 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.72] - 2026-09-12
+
+Components: CasaOS-UI `v0.4.56`, rclone `v1.75.1` (pinned for the first time). Unchanged from v0.4.71: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+### Changed
+
+- **rclone is pinned, and verified like every other package.** The installer ran rclone.org's install script, which installs whatever is current that day, while comparing the installed version against a fixed `v1.61.1` that it never installed. So a fresh box got the current release, and every upgrade after that found a version other than the one it named, deleted `/usr/bin/rclone` out from under the running daemon, and downloaded the current one again, announcing a change to v1.61.1 that did not happen. `RCLONE_TAG` is now pinned in `components.env` like the six components; the archive comes from rclone's own release with the digest for each architecture written into `install.sh` at bundle time from the `SHA256SUMS` that release publishes, and is verified before it is unpacked. An upgrade that finds the pinned version installed leaves it alone. Pinned at v1.75.1, the current stable: the boxes out there are already on whatever was current when they last upgraded, so this is not a downgrade for any of them, and the backup feature that drives the daemon gets a known version to be written against.
+- **Every release now installs itself on a fresh machine and uses it.** A second job runs after publish, on a clean Ubuntu 22.04 VM: it fetches `install.sh` from the release just made, checks it against its published digest, runs it as the README says, and then does what a person would do with the box — every service active, the fork-release marker and the rclone version equal to what the release pins, the dashboard answering, a first user registered and logged in, an rclone destination created and checked over the daemon's socket, an app installed from a compose file, a backup of it taken with the app held still, and the files found on disk with their manifest, the app back up afterwards. Until now no release had been installed from the published bundle by anyone on this side, and the backup transport had never met a running rclone daemon; both were said plainly in the v0.4.66 and v0.4.67 notes. From this release on, both are checked within the hour of every tag.
+
+### Added
+
+- **The panel shown after sharing a folder says who can open it** — the account chosen a moment earlier, or a warning that anyone on the network can read and write it (CasaOS-UI v0.4.56).
+
+### Fixed
+
+- **A failed uninstall resets its button.** The handler compared a property no event carries, so the spinner stayed until the page was reloaded. The dashboard now checks every property it reads off an event against the names the services actually publish; the message bus validates nothing, and a misspelt name was how the update handlers drew two cards for three years.
+
 ## [0.4.71] - 2026-09-12
 
 Components: CasaOS-UI `v0.4.55`. Unchanged from v0.4.70: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
