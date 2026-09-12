@@ -2,6 +2,18 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.71] - 2026-09-12
+
+Components: CasaOS-UI `v0.4.55`. Unchanged from v0.4.70: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+### Fixed
+
+- **Updating an app drew two progress cards, and the real one never went away.** The two handlers for the update events read properties no event has ever carried. So an update opened a nameless card with an empty bar, under the key `undefined`, while the image pull filled the app's real card beside it; at the end, the nameless one was removed and the app's card stayed on screen at whatever percentage it had reached, until the page was reloaded. Every app event names its app in `app:name`, which is how the other seven handlers in that file already read it.
+- **A failed update says why.** There was no handler for the error event at all, so an update that died left its card sitting at the percentage it stopped on, silent.
+- **The New badge after an update means the app was replaced.** It was keyed on a newer image having been pulled, which is also true of a pull that then fails to start the app.
+- **An app the catalogue knows nothing about gets a progress card at all.** The card's title was parsed from the app's store entry with no guard, and an app whose compose file has no `x-casaos` has no store entry, so the parse threw inside the event handler and no card was drawn. It falls back to the app's own name. Same family as the six defects closed in v0.4.65 and v0.4.66.
+- **The progress line is translated.** "Installing 88%" was printed exactly as written, in English, under a title that had been translated.
+
 ## [0.4.70] - 2026-09-12
 
 Components: CasaOS-UI `v0.4.54`. Unchanged from v0.4.69: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.

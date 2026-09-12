@@ -21,6 +21,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.71
+
+**Updating an app drew two progress cards, and the real one never finished.**
+
+One of them had no name and an empty bar, the other counted up and then stopped whereever it got to, staying on screen until the page was reloaded. The two handlers for the update events were reading properties that no event has ever carried, so the first card was filed under `undefined` and the end of the update removed that one instead of the app's.
+
+Fixing the reading fixed three more things it was hiding: an update that fails now says why instead of leaving its card frozen and silent, the New badge means the app was actually replaced rather than merely that an image was pulled, and an app whose compose file has no `x-casaos` gets a progress card at all, instead of none because its missing title threw inside the handler.
+
 ## What is in v0.4.70
 
 **You can see which of your shares are open to everyone, and where the accounts live.**
@@ -374,7 +382,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.54 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.55 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
