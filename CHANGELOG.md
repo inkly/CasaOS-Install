@@ -2,6 +2,18 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.73] - 2026-09-12
+
+Components: CasaOS-AppManagement `v0.4.39`. Unchanged from v0.4.72: CasaOS `v0.4.50`, CasaOS-UI `v0.4.56`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Fixed
+
+- **A backup asked for with the button is written down.** The scheduler recorded its runs and the on-demand route did not, so the History tab only ever showed backups that went off by themselves. Found by the install check introduced in v0.4.72, on its first run: the backup ran, and the check waited two minutes for a record that was never going to exist. Both paths finish their record in the same place now, and a failure is written down with its reason before anything else happens with it.
+
+### Changed
+
+- **The install check is its own workflow.** It still runs after every publish, and it can now be run by hand against any release without publishing anything again. When a step fails it prints what the box has to say for itself — the service logs, rclone's job list over its socket, the containers, the run log — before the machine disappears. Its first run also read the gateway port with a pattern that matched nothing and reached port 80 by accident; it reads the file as written now.
+
 ## [0.4.72] - 2026-09-12
 
 Components: CasaOS-UI `v0.4.56`, rclone `v1.75.1` (pinned for the first time). Unchanged from v0.4.71: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.

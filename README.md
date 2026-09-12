@@ -21,6 +21,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.73
+
+**The first install check earned its keep.**
+
+The job added in v0.4.72 installed the bundle on a fresh machine, brought every service up, registered a user, created an rclone destination over the daemon's socket and installed an app — and then found that a backup asked for with the button is never written to the History tab. Only scheduled backups were being recorded. The backup itself had run; the record was the missing half. AppManagement v0.4.39 records both kinds in the same place, and a failed one is recorded with its reason before anything else is done with it.
+
+The check is its own workflow now, runnable by hand against any release, and when it fails it prints the service logs, rclone's job list and the run log before the machine is gone.
+
 ## What is in v0.4.72
 
 **rclone is pinned for real, and every release now installs itself and takes a backup before anyone else does.**
@@ -391,7 +399,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
 | [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.56 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.39 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
