@@ -61,6 +61,7 @@ readonly COMPONENT_LOCK="${INSTALLER_ROOT}/release/components.env"
 readonly GITHUB_OWNER="${GITHUB_OWNER:-ReCasaOS}"
 readonly CHECKSUMS_BASE_URL="${CHECKSUMS_BASE_URL:-https://github.com/${GITHUB_OWNER}}"
 readonly UPSTREAM_BASE_URL="${UPSTREAM_BASE_URL:-https://github.com/IceWhaleTech}"
+readonly RCLONE_BASE_URL="${RCLONE_BASE_URL:-https://github.com/rclone}"
 
 # shellcheck source=../release/components.env
 source "${COMPONENT_LOCK}"
@@ -111,11 +112,13 @@ trap 'rm -rf "${STAGING_ROOT}"' EXIT
 
 mkdir -p "${OUTPUT_DIR}"
 
-# fetch_checksum <base url> <repo> <tag> <asset>
+# fetch_checksum <base url> <repo> <tag> <asset> [checksum file]
 # Prints the SHA-256 of one asset as published by that repository's release.
+# The file is checksums.txt, as GoReleaser names it, unless the release names
+# it otherwise (rclone publishes SHA256SUMS).
 fetch_checksum() {
-    local base="$1" repo="$2" tag="$3" asset="$4"
-    local url="${base}/${repo}/releases/download/${tag}/checksums.txt"
+    local base="$1" repo="$2" tag="$3" asset="$4" file="${5:-checksums.txt}"
+    local url="${base}/${repo}/releases/download/${tag}/${file}"
     local sum
 
     sum="$(curl -fsSL "${url}" | awk -v a="${asset}" '($2 == a || $2 == "*" a) { print $1; exit }')"
@@ -234,6 +237,22 @@ fill_installer() {
 
     sum="$(compute_checksum "${CHECKSUMS_BASE_URL}" CasaOS-UI "${CASAOS_UI_TAG}" "linux-all-casaos-${CASAOS_UI_TAG}.tar.gz")"
     sed -i "s|__CASAOS_UI_SHA256__|${sum}|g" "${target}"
+
+    # rclone, from its own release. Until now the installer ran rclone.org's
+    # install script, which installs whatever is current that day, while
+    # claiming a target of v1.61.1 that nothing ever installed -- so every
+    # upgrade found a version other than the one it named, removed it, and
+    # installed the current one again. It is pinned like everything else now:
+    # one version, one digest per architecture, verified before it is unpacked.
+    # rclone names the 32-bit ARM build arm-v7 where the components say arm-7.
+    local rclone_arch
+    for arch in amd64 arm64 arm-7; do
+        upper="${arch//-/}"
+        upper="${upper^^}"
+        rclone_arch="${arch/arm-7/arm-v7}"
+        sum="$(fetch_checksum "${RCLONE_BASE_URL}" rclone "${RCLONE_TAG}" "rclone-${RCLONE_TAG}-linux-${rclone_arch}.zip" SHA256SUMS)"
+        sed -i "s|__RCLONE_SHA256_${upper}__|${sum}|g" "${target}"
+    done
     sum="$(compute_checksum "${UPSTREAM_BASE_URL}" CasaOS-AppStore "${CASAOS_APPSTORE_TAG}" "${APPSTORE_SEED_FILE}" "${OUTPUT_DIR}")"
     sed -i "s|__CASAOS_APPSTORE_SHA256__|${sum}|g" "${target}"
 

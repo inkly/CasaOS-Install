@@ -94,6 +94,7 @@ readonly CASAOS_MESSAGE_BUS_TAG="__CASAOS_MESSAGE_BUS_TAG__"
 readonly CASAOS_LOCAL_STORAGE_TAG="__CASAOS_LOCAL_STORAGE_TAG__"
 readonly CASAOS_UI_TAG="__CASAOS_UI_TAG__"
 readonly CASAOS_APPSTORE_TAG="__CASAOS_APPSTORE_TAG__"
+readonly RCLONE_TAG="__RCLONE_TAG__"
 readonly CASAOS_UPDATE_LOG="/var/log/casaos/upgrade.log"
 readonly CASAOS_COMPAT_OVERLAY_FILE="linux-zz-casaos-compat-overlay-${CASAOS_INSTALL_RELEASE_TAG}.tar.gz"
 readonly CASAOS_CORE_PACKAGE_FILE_PREFIX="casaos-${CASAOS_TAG}"
@@ -116,6 +117,9 @@ readonly CASAOS_LOCAL_STORAGE_SHA256_AMD64="__CASAOS_LOCAL_STORAGE_SHA256_AMD64_
 readonly CASAOS_LOCAL_STORAGE_SHA256_ARM64="__CASAOS_LOCAL_STORAGE_SHA256_ARM64__"
 readonly CASAOS_LOCAL_STORAGE_SHA256_ARM7="__CASAOS_LOCAL_STORAGE_SHA256_ARM7__"
 readonly CASAOS_UI_SHA256="__CASAOS_UI_SHA256__"
+readonly RCLONE_SHA256_AMD64="__RCLONE_SHA256_AMD64__"
+readonly RCLONE_SHA256_ARM64="__RCLONE_SHA256_ARM64__"
+readonly RCLONE_SHA256_ARM7="__RCLONE_SHA256_ARM7__"
 readonly CASAOS_APPSTORE_SHA256="__CASAOS_APPSTORE_SHA256__"
 readonly CASAOS_COMPAT_OVERLAY_SHA256="__CASAOS_COMPAT_OVERLAY_SHA256__"
 readonly CASAOS_UNINSTALL_SHA256="__CASAOS_UNINSTALL_SHA256__"
@@ -309,6 +313,8 @@ Check_Arch() {
     case $UNAME_M in
     *aarch64*)
         TARGET_ARCH="arm64"
+        RCLONE_ARCH="arm64"
+        RCLONE_SHA256="${RCLONE_SHA256_ARM64}"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_ARM64}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_ARM64}"
         CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_ARM64}"
@@ -318,6 +324,8 @@ Check_Arch() {
         ;;
     *64*)
         TARGET_ARCH="amd64"
+        RCLONE_ARCH="amd64"
+        RCLONE_SHA256="${RCLONE_SHA256_AMD64}"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_AMD64}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_AMD64}"
         CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_AMD64}"
@@ -327,6 +335,8 @@ Check_Arch() {
         ;;
     *armv7*)
         TARGET_ARCH="arm-7"
+        RCLONE_ARCH="arm-v7"
+        RCLONE_SHA256="${RCLONE_SHA256_ARM7}"
         CASAOS_APP_MANAGEMENT_SHA256="${CASAOS_APP_MANAGEMENT_SHA256_ARM7}"
         CASAOS_CORE_SHA256="${CASAOS_CORE_SHA256_ARM7}"
         CASAOS_GATEWAY_SHA256="${CASAOS_GATEWAY_SHA256_ARM7}"
@@ -682,27 +692,41 @@ Install_Docker() {
 # Rclone & other components                                                  #
 ###############################################################################
 
-#Install Rclone
+# Install rclone at the pinned version, from its own release, verified.
+#
+# This used to run rclone.org's install script, which installs whatever is
+# current that day, while Install_Rclone below compared the installed version
+# against a fixed "v1.61.1" that the script never installed. So a fresh box got
+# the current release, and every upgrade after that found a version other than
+# the one it named, deleted the binary out from under the running daemon, and
+# downloaded the current one again. The pin is real now, and the archive is
+# checked against a digest written in at release time like every other package.
 Install_rclone_from_source() {
-  ${sudo_cmd} wget -qO ./install.sh https://rclone.org/install.sh
-  if [[ "${REGION}" = "China" ]] || [[ "${REGION}" = "CN" ]]; then
-    sed -i 's/downloads.rclone.org/casaos.oss-cn-shanghai.aliyuncs.com/g' ./install.sh
-  fi
-  ${sudo_cmd} chmod +x ./install.sh
-  ${sudo_cmd} ./install.sh || {
-    Show 1 "Installation failed, please try again."
-    ${sudo_cmd} rm -rf install.sh
-    exit 1
-  }
-  ${sudo_cmd} rm -rf install.sh
-  Show 0 "Rclone v1.61.1 installed successfully."
+  local archive="rclone-${RCLONE_TAG}-linux-${RCLONE_ARCH}.zip"
+  local url="${CASA_DOWNLOAD_DOMAIN}rclone/rclone/releases/download/${RCLONE_TAG}/${archive}"
+  local unpack
+  unpack="$(mktemp -d)" || Show 1 "Failed to create a temporary directory for rclone"
+
+  Show 2 "Downloading rclone ${RCLONE_TAG}..."
+  GreyStart
+  ${sudo_cmd} wget -t 3 -q ${WGET_PROGRESS} -O "${unpack}/${archive}" "${url}" || Show 1 "Failed to download rclone"
+  ColorReset
+
+  pushd "${unpack}" >/dev/null
+  Verify_Fork_Package "${archive}" "${RCLONE_SHA256}"
+  ${sudo_cmd} unzip -q -o -j "${archive}" "rclone-${RCLONE_TAG}-linux-${RCLONE_ARCH}/rclone" -d . || Show 1 "Failed to extract rclone"
+  ${sudo_cmd} install -m 0755 -o root -g root rclone "${PREFIX}/usr/bin/rclone" || Show 1 "Failed to install rclone"
+  popd >/dev/null
+  ${sudo_cmd} rm -rf "${unpack}"
+
+  Show 0 "rclone ${RCLONE_TAG} installed."
 }
 
 Install_Rclone() {
   Show 2 "Install the necessary dependencies: Rclone"
   if [[ -x "$(command -v rclone)" ]]; then
     version=$(rclone --version 2>>errors | head -n 1)
-    target_version="rclone v1.61.1"
+    target_version="rclone ${RCLONE_TAG}"
     rclone1="${PREFIX}/usr/share/man/man1/rclone.1.gz"
     if [ "$version" != "$target_version" ]; then
       Show 3 "Will change rclone from $version to $target_version."
