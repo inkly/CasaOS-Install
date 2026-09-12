@@ -21,6 +21,14 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.70
+
+**You can see which of your shares are open to everyone, and where the accounts live.**
+
+The shared folders list named an account only when a share had one, glued onto the folder's name. A share open to the whole network said nothing at all, so the dangerous case was the one that looked like every other row. Each row carries its own tag now: the account, or Everyone in warning colours.
+
+The accounts themselves had no entrance in the dashboard. The only way in was a link inside the dialog that assigns one to a folder, which is no help to somebody who has not made an account yet. Shared folders has a Manage accounts button.
+
 ## What is in v0.4.69
 
 **Sharing a folder could only ever make it public.**
@@ -366,7 +374,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.53 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.54 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |

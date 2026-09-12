@@ -2,6 +2,17 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.70] - 2026-09-12
+
+Components: CasaOS-UI `v0.4.54`. Unchanged from v0.4.69: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+### Added
+
+- **Every shared folder says who can open it.** The list named an account only when a share had one, and glued it onto the folder's name; a share open to the whole network said nothing at all, which is exactly what somebody scanning for an unprotected share cannot see. Each row now carries its own tag: the account, or **Everyone** in warning colours.
+- **Share accounts have an entrance.** Until now the only way to reach them was a link inside the dialog that assigns an account to a folder, which is no use to somebody who has not made one yet. The **Shared folders** page has a **Manage accounts** button.
+
+Together with v0.4.69 this closes [ReCasaOS/CasaOS#1](https://github.com/ReCasaOS/CasaOS/issues/1), which was two complaints in one: shares could not be protected from the routes people use, and there was nowhere to find the accounts.
+
 ## [0.4.69] - 2026-09-12
 
 Components: CasaOS-UI `v0.4.53`. Unchanged from v0.4.68: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
