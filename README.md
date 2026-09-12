@@ -21,6 +21,16 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.69
+
+**Sharing a folder could only ever make it public.**
+
+Right-click a folder, Share, and the folder went onto the network readable and writable by anyone — no dialog, no opportunity to say otherwise. Ticking Shared while creating a folder did the same. Shares restricted to an account have worked since v0.4.40, but the switch that turns one on was only on the third route, the multi-folder picker in the Files sidebar, so the two paths everybody takes were the two that could not protect anything.
+
+Both ask now. The default is still guest — flipping it would break every folder shared to a TV or a phone — but it is a visible choice with a sentence saying what it means, rather than something you find out from `smb.conf`.
+
+Upgrading does not convert a share that already exists: Files → Shared folders → the share → change who can open it.
+
 ## What is in v0.4.68
 
 **The settings panel is as wide as it was meant to be.**
@@ -356,7 +366,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.52 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.53 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.38 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |

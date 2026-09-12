@@ -2,6 +2,18 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.69] - 2026-09-12
+
+Components: CasaOS-UI `v0.4.53`. Unchanged from v0.4.68: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
+
+### Fixed
+
+- **Sharing a folder could only ever make it public.** Right-click a folder, Share, and the dashboard created the share with guest access and opened no dialog at all: the folder went onto the network readable and writable by anyone, with no opportunity to say otherwise. Ticking **Shared** while creating a folder did the same. Protected shares have been supported since v0.4.40, but the switch that turns one on lived only on the third route — the multi-folder picker reached from the Files sidebar — so both obvious paths were the ones that could not protect anything, and somebody who upgraded specifically to protect a share found nothing had changed.
+
+  Both routes now ask, with the same controls the picker has, and guest access says what it means on screen instead of being left to be discovered. The default is still guest — flipping it would break every folder shared to a TV or a phone — but it is now a visible choice rather than an implied one.
+
+  An existing share is not converted by upgrading: Files → **Shared folders** → the share → change who can open it. Reported as [ReCasaOS/CasaOS#1](https://github.com/ReCasaOS/CasaOS/issues/1).
+
 ## [0.4.68] - 2026-09-11
 
 Components: CasaOS-UI `v0.4.52`. Unchanged from v0.4.67: CasaOS `v0.4.50`, AppManagement `v0.4.38`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`.
