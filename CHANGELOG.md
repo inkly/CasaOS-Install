@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.74] - 2026-09-13
+
+Components: CasaOS-AppManagement `v0.4.40`. Unchanged from v0.4.73: CasaOS `v0.4.50`, CasaOS-UI `v0.4.56`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Fixed
+
+- **An app with no `.env` backs up.** The backup plan listed the app's `.env` unconditionally, and most apps have none: rclone was sent after a file that was not there, answered `object not found`, and the whole backup failed on it — with the compose file already copied and the app's data never reached. Found by the install check on v0.4.73, which was the first backup ever run end to end: the daemon on its socket, the destination, a directory synced and a file copied through it, the app held still and started again all worked; this was the one thing left. The inventory looks before it lists.
+
 ## [0.4.73] - 2026-09-12
 
 Components: CasaOS-AppManagement `v0.4.39`. Unchanged from v0.4.72: CasaOS `v0.4.50`, CasaOS-UI `v0.4.56`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
