@@ -246,6 +246,54 @@ jobs:
           docker ps --format '{{.Names}} {{.Status}}' | grep '^smoke Up'
           test -f /var/lib/casaos/apps/smoke/docker-compose.yml
 
+      # The same backup through a destination that encrypts: nothing readable
+      # lands on disk, everything is readable back through the remote, and the
+      # restore does not know the difference. Then one backup is deleted and
+      # the destination stops listing it.
+      - name: An encrypted destination, and deleting a backup
+        run: |
+          set -euo pipefail
+          sudo mkdir -p /var/tmp/casaos-backup-vault
+          curl -fsS -X PUT "${CASA_URL}/v2/app_management/backup/destinations/vault" \
+            -H "Authorization: ${CASA_TOKEN}" -H 'content-type: application/json' \
+            -d '{"backend":"alias","parameters":{"remote":"/var/tmp/casaos-backup-vault"},"encrypt":true,"password":"smoke-test-vault"}' | jq .
+          curl -fsS -X POST "${CASA_URL}/v2/app_management/backup/destinations/vault/check" -H "Authorization: ${CASA_TOKEN}" | jq .
+          # the raw remote underneath is not a destination
+          curl -fsS "${CASA_URL}/v2/app_management/backup/destinations" -H "Authorization: ${CASA_TOKEN}" | jq -e '.data | index("vault") != null and index("vault-raw") == null' >/dev/null
+          before="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          sleep 1
+          curl -fsS -X POST "${CASA_URL}/v2/app_management/compose/smoke/backup" \
+            -H "Authorization: ${CASA_TOKEN}" -H 'content-type: application/json' \
+            -d '{"destination":"vault","hold_still":true}' | jq .
+          for _ in $(seq 1 40); do
+            run="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+              | jq -c --arg b "${before}" '.data // [] | map(select(.app == "smoke" and .destination == "vault" and .restore != true and .started_at > $b)) | first // empty')"
+            [ -n "${run}" ] && [ "$(jq -r '.finished_at' <<<"${run}")" != "0001-01-01T00:00:00Z" ] && break
+            sleep 3
+          done
+          echo "vault run: ${run}"
+          test -n "${run}"
+          test "$(jq -r '.error // ""' <<<"${run}")" = ""
+          # nothing readable on disk: no file is named index.html or manifest.json
+          sudo find /var/tmp/casaos-backup-vault -type f | tee vault-files.txt
+          test "$(wc -l < vault-files.txt)" -gt 0
+          ! grep -qE 'index.html|manifest.json' vault-files.txt
+          # everything readable through the remote
+          sudo rclone lsf -R "casaos-backup-vault:smoke/" | tee vault-listing.txt
+          grep -q 'manifest.json$' vault-listing.txt
+          grep -q 'index.html$' vault-listing.txt
+          stamp="$(jq -r '.stamp' <<<"${run}")"
+          # what the destination holds, then one backup less
+          curl -fsS "${CASA_URL}/v2/app_management/backup/destinations/vault/runs" -H "Authorization: ${CASA_TOKEN}" \
+            | jq -e --arg s "${stamp}" '.data | map(select(.app == "smoke")) | first | .stamps | index($s) != null' >/dev/null
+          curl -fsS -X DELETE "${CASA_URL}/v2/app_management/backup/destinations/vault/runs/smoke/${stamp}" -H "Authorization: ${CASA_TOKEN}" | jq .
+          held="$(curl -fsS "${CASA_URL}/v2/app_management/backup/destinations/vault/runs" -H "Authorization: ${CASA_TOKEN}")"
+          echo "${held}" | jq .
+          test "$(jq -r --arg s "${stamp}" '.data // [] | map(select(.app == "smoke")) | first // {stamps: []} | .stamps | index($s)' <<<"${held}")" = null
+          # and the run log kept its record
+          curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+            | jq -e --arg s "${stamp}" '.data | map(select(.stamp == $s and .destination == "vault")) | length == 1' >/dev/null
+
       # What the box has to say for itself, when a step above failed: the
       # service logs, the daemon's job list, the containers. Without this a red
       # run says which step and nothing else, and the machine is gone.

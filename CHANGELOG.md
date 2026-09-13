@@ -2,6 +2,16 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.79] - 2026-09-13
+
+Components: CasaOS-AppManagement `v0.4.44`, CasaOS-UI `v0.4.59`. Unchanged from v0.4.78: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Added
+
+- **A card while a backup or a restore runs.** Four events on the message bus — `backup:begin`, `backup:progress`, `backup:end`, `backup:error` — carrying the app, the destination, the run and whether it is a backup or a restore, and the dashboard shows them on the card an install gets: how far along, and a toast at the end saying where it went or what went wrong. Progress is one event per folder rather than per byte: what a person watching wants to know is which folder it is on and how many are left. Until now an app of two hundred gigabytes copied for an hour with nothing on screen.
+- **Encrypted destinations.** A checkbox on the destination form puts rclone's crypt backend on top of the one chosen, so names and contents are ciphertext before they leave this box and a bucket at a provider holds what it cannot read. Two remotes: the backend itself under a `-raw` suffix that is refused in a name, never listed and deleted together with the top one; everything else talks to the top one and never knows the difference. The password is obscured into rclone's config the way it keeps every password and cannot be read back — losing it loses every backup at that destination, which the form says before the box is ticked. The install check backs the app up through an encrypted destination, checks that nothing on disk is named `index.html` or `manifest.json`, and reads both back through the remote.
+- **Delete one backup**, from the destination browser, with the same kind of confirmation a restore gets. The run log keeps its record: that a backup was taken and later deleted is history worth keeping. The install check deletes one and checks the destination stops listing it while the log still does.
+
 ## [0.4.78] - 2026-09-13
 
 Components: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`. Unchanged from v0.4.77: CasaOS-AppManagement `v0.4.43`, CasaOS-UI `v0.4.58`, Common `v0.4.23`, rclone `v1.75.1`.
