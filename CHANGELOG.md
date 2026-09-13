@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.81] - 2026-09-13
+
+Components: CasaOS-AppManagement `v0.4.46`. Unchanged from v0.4.80: CasaOS `v0.4.51`, CasaOS-UI `v0.4.61`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Fixed
+
+- **Do not restore a box from v0.4.80.** Its restore of the box paired the parts of a backup with this box's paths by their number, and a backup numbers its parts over those present when it was taken: on a box without a Samba config the database folder was part 2, and the restore put it where the Samba config goes and the next folder's contents over the database. Caught by the install check on the v0.4.80 tag itself, on a disposable machine. Each part goes back to its own path now, whatever number it landed under, and a test takes a backup with one part absent and restores it where every part exists. v0.4.80 was published for under an hour; if you took a backup of a box with it, the backup is fine — only the restore was wrong, and only when a part was absent when the backup was taken.
+
 ## [0.4.80] - 2026-09-13
 
 Components: CasaOS-AppManagement `v0.4.45`, CasaOS-UI `v0.4.61`. Unchanged from v0.4.79: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`, Common `v0.4.23`, rclone `v1.75.1`.

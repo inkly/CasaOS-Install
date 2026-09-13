@@ -21,6 +21,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.81
+
+**Do not restore a box from v0.4.80; v0.4.81 does it right.**
+
+The restore of the box matched the parts of a backup with this box's paths by number, and the numbers are given out over the parts that were present when the backup was taken. With the Samba config absent, the database folder was part 2 and came back where the Samba config goes. The install check caught it on the v0.4.80 tag itself, on a disposable machine. Each part goes back to its own path now. A backup taken with v0.4.80 is fine; only the restore was wrong.
+
 ## What is in v0.4.80
 
 **The box itself can be backed up, and put back.**
@@ -445,7 +451,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.51 |
 | [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.61 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.45 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.46 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.25 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.24 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.23 |
