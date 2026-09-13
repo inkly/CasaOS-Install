@@ -189,6 +189,45 @@ jobs:
           test ! -e /DATA/AppData/smoke/html/extra.txt
           docker ps --format '{{.Names}} {{.Status}}' | grep '^smoke Up'
 
+      # The case a backup exists for: the app is gone, with its data. The
+      # destination is asked what it holds, the app must show as not installed,
+      # and a restore has to install it from the compose file the backup kept
+      # and put its data back -- through the same door a fresh box would use.
+      - name: A restore of it when it is not installed any more
+        run: |
+          set -euo pipefail
+          stamp="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+            | jq -r '.data // [] | map(select(.app == "smoke" and .restore != true and (.error // "") == "")) | first | .stamp')"
+          test -n "${stamp}" && test "${stamp}" != null
+          curl -fsS -X DELETE "${CASA_URL}/v2/app_management/compose/smoke?delete_config_folder=true" \
+            -H "Authorization: ${CASA_TOKEN}" | jq .
+          for _ in $(seq 1 30); do
+            docker ps -a --format '{{.Names}}' | grep -q '^smoke$' || break
+            sleep 2
+          done
+          docker ps -a --format '{{.Names}}' | grep -q '^smoke$' && { echo "smoke is still there"; exit 1; }
+          sudo rm -rf /DATA/AppData/smoke
+          test ! -e /DATA/AppData/smoke/html/index.html
+          held="$(curl -fsS "${CASA_URL}/v2/app_management/backup/destinations/smoke/runs" -H "Authorization: ${CASA_TOKEN}")"
+          echo "${held}" | jq .
+          test "$(jq -r '.data | map(select(.app == "smoke")) | first | .installed' <<<"${held}")" = false
+          jq -e --arg s "${stamp}" '.data | map(select(.app == "smoke")) | first | .stamps | index($s) != null' <<<"${held}" >/dev/null
+          curl -fsS -X POST "${CASA_URL}/v2/app_management/backup/restore" \
+            -H "Authorization: ${CASA_TOKEN}" -H 'content-type: application/json' \
+            -d "{\"destination\":\"smoke\",\"app\":\"smoke\",\"stamp\":\"${stamp}\"}" | jq .
+          for _ in $(seq 1 60); do
+            run="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+              | jq -c '.data // [] | map(select(.app == "smoke" and .restore == true)) | first // empty')"
+            [ -n "${run}" ] && break
+            sleep 3
+          done
+          echo "restore run: ${run}"
+          test -n "${run}"
+          test "$(jq -r '.error // ""' <<<"${run}")" = ""
+          test "$(cat /DATA/AppData/smoke/html/index.html)" = "hello from ${CASAOS_RELEASE_TAG}"
+          docker ps --format '{{.Names}} {{.Status}}' | grep '^smoke Up'
+          test -f /var/lib/casaos/apps/smoke/docker-compose.yml
+
       # What the box has to say for itself, when a step above failed: the
       # service logs, the daemon's job list, the containers. Without this a red
       # run says which step and nothing else, and the machine is gone.

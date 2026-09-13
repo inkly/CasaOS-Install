@@ -21,6 +21,12 @@ Running the same command on an existing install upgrades it. Installs made from 
 
 Every package the installer downloads is verified against a SHA-256 digest before extraction, and every one of them is downloaded from a ReCasaOS release. The digests are written into `install.sh` at release time from the checksums each component publishes, or — for the dashboard and the App Store seed, whose releases publish no checksums — computed from the package as published; none is typed by hand. The uninstall script the installer downloads is verified the same way, against the digest of the copy shipped in the release.
 
+## What is in v0.4.77
+
+**A way back for a box that has nothing.**
+
+Every destination has a Restore… button that lists what it holds: each app, whether it runs here, its backups newest first. An app that is not installed here is installed from the compose file its backup kept, then its data is put back. This is the case a backup exists for, and the install check now does it on every release: uninstall the app with its data, restore it from the destination alone, and find the container up with the original files.
+
 ## What is in v0.4.76
 
 **The restore was fine; the API forgot to say so.**
@@ -418,8 +424,8 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.50 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.57 |
-| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.42 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.58 |
+| [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.43 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.24 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.23 |
 | [CasaOS-MessageBus](https://github.com/ReCasaOS/CasaOS-MessageBus) | v0.4.22 |
