@@ -212,12 +212,17 @@ jobs:
           echo "${held}" | jq .
           test "$(jq -r '.data | map(select(.app == "smoke")) | first | .installed' <<<"${held}")" = false
           jq -e --arg s "${stamp}" '.data | map(select(.app == "smoke")) | first | .stamps | index($s) != null' <<<"${held}" >/dev/null
+          # the run log already holds the restore from the step above; only one
+          # started after this moment counts, and installing takes longer than
+          # putting files back into an app that is there
+          before="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          sleep 1
           curl -fsS -X POST "${CASA_URL}/v2/app_management/backup/restore" \
             -H "Authorization: ${CASA_TOKEN}" -H 'content-type: application/json' \
             -d "{\"destination\":\"smoke\",\"app\":\"smoke\",\"stamp\":\"${stamp}\"}" | jq .
-          for _ in $(seq 1 60); do
+          for _ in $(seq 1 100); do
             run="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
-              | jq -c '.data // [] | map(select(.app == "smoke" and .restore == true)) | first // empty')"
+              | jq -c --arg b "${before}" '.data // [] | map(select(.app == "smoke" and .restore == true and .started_at > $b)) | first // empty')"
             [ -n "${run}" ] && break
             sleep 3
           done
