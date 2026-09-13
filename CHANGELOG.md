@@ -2,6 +2,14 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.76] - 2026-09-13
+
+Components: CasaOS-AppManagement `v0.4.42`. Unchanged from v0.4.75: CasaOS `v0.4.50`, CasaOS-UI `v0.4.57`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Fixed
+
+- **A restore shows as one.** The run log recorded restores as restores and the API dropped the flag on the way out: the handler that turns a record into the API's type is written field by field, and the new field was not added there. The dashboard could never have tagged a restore, and the v0.4.75 install check waited two minutes for a run it had already been handed — the restore itself had finished in three seconds. The mapping is one function now, with a test that encodes a record both ways and compares the two whole, so the next field added to the record cannot go missing from the API without that test saying so.
+
 ## [0.4.75] - 2026-09-13
 
 Components: CasaOS-AppManagement `v0.4.41`, CasaOS-UI `v0.4.57`. Unchanged from v0.4.74: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
