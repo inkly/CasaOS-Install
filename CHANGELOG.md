@@ -2,6 +2,16 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.78] - 2026-09-13
+
+Components: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`. Unchanged from v0.4.77: CasaOS-AppManagement `v0.4.43`, CasaOS-UI `v0.4.58`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Fixed
+
+- **Every fresh install failed the first start of two services.** `casaos-message-bus` created the folder of its runtime database and not the one of its persistent database, so its very first start could not open `/var/lib/casaos/db/message-bus.db` — sqlite reports a missing folder as `unable to open database file: out of memory (14)` — and systemd's restart a second later found the folder made by another service in the meantime. In that second, `casaos-local-storage` (and the user service and the core, on a slower box) reached a bus that was not there, and a retry loop that guarded its log line against a nil response dereferenced that response two lines later: a panic, restarted by systemd into a bus that was up by then. Both showed in every install log as `Job for … failed because the control process exited with error code`, and the install check now fails on those words rather than printing them.
+- **`CURRENT_BIN_FILE_LEGACY_NOT_FOUND: command not found`, six times per install.** When no legacy binary exists the migration scripts held that sentinel in a variable and then ran the variable as a command. The legacy binary is asked for its version only when there is one to ask.
+- **The version floor moves with the core.** A box without the `/var/lib/casaos/fork-release` marker fell back to a `FORK_RELEASE_VERSION` compiled three months ago; it is the release that ships this core now. The marker is the truth for every box that has it.
+
 ## [0.4.77] - 2026-09-13
 
 Components: CasaOS-AppManagement `v0.4.43`, CasaOS-UI `v0.4.58`. Unchanged from v0.4.76: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.

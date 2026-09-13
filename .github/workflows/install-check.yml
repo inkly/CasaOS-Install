@@ -71,17 +71,18 @@ jobs:
           test "${version}" = "rclone ${RCLONE_TAG}"
           test -S /var/run/rclone/rclone.sock
 
-      # What the two units that fail their first start on every install have to
-      # say about it. Printed, not asserted, until the race is understood.
+      # No service may fail its first start. Two did on every install until v0.4.78;
+      # the journals are printed so a red run says which one, and why.
       - name: First-start journals
         if: always()
         run: |
-          grep -n 'Job for' install.log || echo 'no first-start failure in the install log'
+          if grep -n 'Job for' install.log; then echo 'a service failed its first start'; failed=1; else echo 'no first-start failure in the install log'; failed=0; fi
           for unit in casaos-message-bus casaos-local-storage casaos-gateway; do
             echo "::group::${unit}"
             sudo journalctl -u "${unit}.service" --no-pager -o short-iso | head -n 60
             echo "::endgroup::"
           done
+          test "${failed}" -eq 0
 
       - name: The dashboard answers
         run: |
