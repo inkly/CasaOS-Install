@@ -160,6 +160,35 @@ jobs:
           # the app came back after being held still for the copy
           docker ps --format '{{.Names}} {{.Status}}' | grep '^smoke Up'
 
+      # The other direction. The file the backup holds is overwritten, the
+      # restore is asked for, and the original content has to be back -- through
+      # the same daemon, with the app held still and started again.
+      - name: A restore of it, from that backup
+        run: |
+          set -euo pipefail
+          stamp="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+            | jq -r '.data // [] | map(select(.app == "smoke" and .restore != true and (.error // "") == "")) | first | .stamp')"
+          test -n "${stamp}" && test "${stamp}" != null
+          echo "restoring from ${stamp}"
+          echo "changed after the backup" | sudo tee /DATA/AppData/smoke/html/index.html >/dev/null
+          echo "an extra file" | sudo tee /DATA/AppData/smoke/html/extra.txt >/dev/null
+          curl -fsS -X POST "${CASA_URL}/v2/app_management/backup/restore" \
+            -H "Authorization: ${CASA_TOKEN}" -H 'content-type: application/json' \
+            -d "{\"destination\":\"smoke\",\"app\":\"smoke\",\"stamp\":\"${stamp}\"}" | jq .
+          for _ in $(seq 1 40); do
+            run="$(curl -fsS "${CASA_URL}/v2/app_management/backup/runs" -H "Authorization: ${CASA_TOKEN}" \
+              | jq -c '.data // [] | map(select(.app == "smoke" and .restore == true)) | first // empty')"
+            [ -n "${run}" ] && break
+            sleep 3
+          done
+          echo "restore run: ${run}"
+          test -n "${run}"
+          test "$(jq -r '.error // ""' <<<"${run}")" = ""
+          # as it was: the content is back, and the file added since is gone
+          test "$(cat /DATA/AppData/smoke/html/index.html)" = "hello from ${CASAOS_RELEASE_TAG}"
+          test ! -e /DATA/AppData/smoke/html/extra.txt
+          docker ps --format '{{.Names}} {{.Status}}' | grep '^smoke Up'
+
       # What the box has to say for itself, when a step above failed: the
       # service logs, the daemon's job list, the containers. Without this a red
       # run says which step and nothing else, and the machine is gone.

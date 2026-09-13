@@ -2,6 +2,15 @@
 
 All notable changes to the CasaOS fork installer are documented here.
 
+## [0.4.75] - 2026-09-13
+
+Components: CasaOS-AppManagement `v0.4.41`, CasaOS-UI `v0.4.57`. Unchanged from v0.4.74: CasaOS `v0.4.50`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
+
+### Added
+
+- **Restore.** Every finished backup in the History tab has a Restore button, and `POST /v2/app_management/backup/restore` behind it. The app is stopped for the copy and started again afterwards; its data folders and volumes are made to hold what the backup holds, and files added since the backup are removed, because a restore means "as it was". Where things go is worked out from the app as it is installed now and never from the paths in the backup's manifest, which is a file on a remote that anyone with the credentials can edit; what the backup holds and the app no longer declares is reported in the run, not written anywhere. An app that is not installed is installed first, from the compose file the backup holds. The confirmation says all of this before anything is touched.
+- **The install check restores too.** After the backup it overwrites the file the backup holds, adds one, asks for the restore, and checks that the original content is back and the extra file is gone, with the app running again. From this release on, a release is not green until a backup has been taken and put back on a fresh machine.
+
 ## [0.4.74] - 2026-09-13
 
 Components: CasaOS-AppManagement `v0.4.40`. Unchanged from v0.4.73: CasaOS `v0.4.50`, CasaOS-UI `v0.4.56`, Gateway `v0.4.24`, UserService `v0.4.23`, LocalStorage `v0.4.34`, MessageBus `v0.4.22`, Common `v0.4.23`, rclone `v1.75.1`.
