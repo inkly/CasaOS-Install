@@ -444,7 +444,7 @@ The first release cut from this account, kept here because it is what v0.4.41 bu
 | Component | Release |
 |---|---|
 | [CasaOS](https://github.com/ReCasaOS/CasaOS) | v0.4.51 |
-| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.60 |
+| [CasaOS-UI](https://github.com/ReCasaOS/CasaOS-UI) | v0.4.61 |
 | [CasaOS-AppManagement](https://github.com/ReCasaOS/CasaOS-AppManagement) | v0.4.45 |
 | [CasaOS-Gateway](https://github.com/ReCasaOS/CasaOS-Gateway) | v0.4.25 |
 | [CasaOS-UserService](https://github.com/ReCasaOS/CasaOS-UserService) | v0.4.24 |

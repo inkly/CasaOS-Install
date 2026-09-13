@@ -4,11 +4,12 @@ All notable changes to the CasaOS fork installer are documented here.
 
 ## [0.4.80] - 2026-09-13
 
-Components: CasaOS-AppManagement `v0.4.45`, CasaOS-UI `v0.4.60`. Unchanged from v0.4.79: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`, Common `v0.4.23`, rclone `v1.75.1`.
+Components: CasaOS-AppManagement `v0.4.45`, CasaOS-UI `v0.4.61`. Unchanged from v0.4.79: CasaOS `v0.4.51`, Gateway `v0.4.25`, UserService `v0.4.24`, LocalStorage `v0.4.35`, MessageBus `v0.4.23`, Common `v0.4.23`, rclone `v1.75.1`.
 
 ### Added
 
 - **Back up the box itself.** Apps could be put back on a machine that has nothing; the machine's own state could not — its users, its shares and their accounts, its schedules, the destinations it sends backups to. A button on the Destinations tab copies `/etc/casaos`, `/etc/samba/smb.casa.conf`, `/var/lib/casaos/db`, `/var/lib/casaos/conf` and rclone's configuration to a destination under the name `casaos-system`, shown as "This box" in History and in the destination browser, and restored from there like an app. The services holding those files are stopped for the copy in both directions — sqlite files copied under a running writer are the same bad backup a database in a container would be — and started again after, whatever happened; rclone is restarted last, once nothing more goes through it, when its configuration came back. The confirmation says the dashboard goes away for a few seconds.
+- **A rebuild names itself the way a recreate does** (CasaOS-UI v0.4.61): the rebuild of a v1 app passed an object where the generated client expects a boolean, the client happened to flatten it into a query parameter, and the card matched on the echo of that accident. It sends `rebuild:container:id` now, the mechanism a recreate already uses.
 - **The install check does it too:** a marker in the box's state goes out with the backup, is deleted, and comes back with the restore, with every service active again and the login still working.
 
 ## [0.4.79] - 2026-09-13
